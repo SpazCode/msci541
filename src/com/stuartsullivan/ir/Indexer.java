@@ -1,5 +1,8 @@
 package com.stuartsullivan.ir;
 
+import com.stuartsullivan.ir.models.PostingList;
+import com.stuartsullivan.ir.models.Vocabulary;
+
 import java.io.File;
 
 /**
@@ -31,14 +34,22 @@ public class Indexer {
                 return;
             }
 
-            f = new File(args[1]);
-            if(f.exists() || !f.getParentFile().isDirectory()) {
-                System.out.println("Invalid Output: The output must be a valid directory path but must be a new path");
-                System.exit(1);
-                return;
-            }
+            // Enusre that the destination is new
+//            f = new File(args[1]);
+//            if(f.exists() || !f.getParentFile().isDirectory()) {
+//                System.out.println("Invalid Output: The output must be a valid directory path but must be a new path");
+//                System.exit(1);
+//                return;
+//            }
 
-            DocumentProccessor.extractCorpus(args[0], args[1]);
+            // Create Vocabulary and PostingLists Objects
+            PostingList postings = new PostingList(args[1]);
+            Vocabulary vocabulary = new Vocabulary(args[1]);
+            // Process the Documents
+            DocumentProccessor.extractCorpus(args[0], args[1], vocabulary, postings);
+            // Update the Vocabulary and PostingList
+            vocabulary.UpdateDictionary();
+            postings.updatePostingList();
         } catch (Exception e) {
             e.printStackTrace();
         }

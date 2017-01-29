@@ -1,4 +1,4 @@
-package com.stuartsullivan.ir;
+package com.stuartsullivan.ir.models;
 
 /**
  * Created by stuart on 1/13/17.
@@ -9,14 +9,14 @@ package com.stuartsullivan.ir;
  */
 public class Document {
     // The Components of the 
-    private String raw;
-    private String text;
-    private String graphic;
-    private String docno;
-    private String docid;
-    private String date;
-    private String headline;
-    private String byLine;
+    private String raw = "";
+    private String text = "";
+    private String graphic = "";
+    private String docno = "";
+    private String docid = "";
+    private String date = "";
+    private String headline = "";
+    private String byLine = "";
 
     public Document() {
     }

@@ -2,10 +2,17 @@ package com.stuartsullivan.ir;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.stuartsullivan.ir.models.Document;
+import com.stuartsullivan.ir.models.PostingList;
+import com.stuartsullivan.ir.models.Vocabulary;
+import com.stuartsullivan.ir.utils.Lexiconer;
+import com.stuartsullivan.ir.utils.SimpleListInt;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -22,7 +29,7 @@ import java.util.zip.GZIPInputStream;
  * > Updating the internal id index of Documents
  */
 public class DocumentProccessor {
-    public static void extractCorpus(String source, String output) {
+    public static void extractCorpus(String source, String output, Vocabulary vocabulary, PostingList postings) {
         try {
             resetIndex();
             // Load the corpus archive
@@ -43,7 +50,7 @@ public class DocumentProccessor {
                 if (line.contains("</DOC>")) {
                     // Send document segment to processor once end tag is found
                     // TODO Make Processor Multithreaded Maybe?!?
-                    processDocument(segment, output, id);
+                    processDocument(segment, output, id, vocabulary, postings);
                     segment = "";
                     // Incrament ID
                     id++;
@@ -59,8 +66,9 @@ public class DocumentProccessor {
         }
     }
 
-    private static void processDocument(String doc, String output, int id) {
+    private static void processDocument(String doc, String output, int id, Vocabulary vocabulary, PostingList postings) {
         try {
+            System.out.print("Processing: " + id + "\n");
             // Create new Document
             Document docObj = new Document();
             // Populate Document
@@ -89,6 +97,10 @@ public class DocumentProccessor {
             if(headlineMatch.find()) docObj.setHeadline(headlineMatch.group(1));
             if(textMatch.find()) docObj.setText(textMatch.group(1));
             if(byLineMatch.find()) docObj.setByLine(byLineMatch.group(1));
+
+            // Tokenize the text
+            constructPostingList(postings, vocabulary, id,
+                    new String[] {docObj.getText(), docObj.getGraphic(), docObj.getHeadline()});
             // Save the Document
             // http://www.mkyong.com/java/how-to-enable-pretty-print-json-output-gson/
             Gson gson =  new GsonBuilder().setPrettyPrinting().create();
@@ -104,9 +116,39 @@ public class DocumentProccessor {
             fwr.close();
             updateIndex(docObj, output);
             // Output the Internal ID 
-            System.out.print(docObj.getDocid() + "\n");
+            System.out.print("Processed: " + docObj.getDocid() + "\n");
         } catch (IOException e) {
             System.out.println("Error parsing document");
+            e.printStackTrace();
+        }
+    }
+
+    private static ArrayList<String> tokenizeText(String[] body) {
+        String text = "";
+        for (String section : body) {
+            text = text.concat(" ").concat(section);
+        }
+        return Lexiconer.Tokenize(text);
+    }
+
+    private static SimpleListInt tokenIds(ArrayList<String> tokens, Vocabulary vocabulary) {
+        SimpleListInt tokenIds = new SimpleListInt();
+        for(String token: tokens) {
+            tokenIds.add(vocabulary.getId(token));
+        }
+        return tokenIds;
+    }
+
+    private static void constructPostingList(PostingList postings, Vocabulary vocabulary, int docId, String[] content) {
+        ArrayList<String> tokens = tokenizeText(content);
+        SimpleListInt tokenIds = tokenIds(tokens, vocabulary);
+        HashMap<Integer, Integer> tokenCounts = Lexiconer.CountTokens(tokenIds.getValues());
+        try {
+            for (int tokenId : tokenCounts.keySet()) {
+                postings.add(tokenId, docId, tokenCounts.get(tokenId));
+            }
+        } catch (Exception e) {
+            System.out.println("" + postings.getLength());
             e.printStackTrace();
         }
     }
@@ -139,7 +181,7 @@ public class DocumentProccessor {
             fwr.write("");
             fwr.close();
         } catch (Exception e) {
-            System.out.print("No index to reset");
+            System.out.println("No index to reset");
             // e.printStackTrace();
         }
     }

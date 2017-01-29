@@ -2,6 +2,7 @@
 package com.stuartsullivan.ir;
 
 import com.google.gson.Gson;
+import com.stuartsullivan.ir.models.Document;
 
 import java.io.*;
 
