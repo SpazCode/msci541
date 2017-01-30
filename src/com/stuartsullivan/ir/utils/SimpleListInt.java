@@ -3,12 +3,16 @@ package com.stuartsullivan.ir.utils;
 /**
  * Created by stuart on 1/26/17.
  */
-public class SimpleListInt {
+public class SimpleListInt implements Comparable<SimpleListInt> {
     private int[] values;
     private int length = 0;
 
     public SimpleListInt() {
         this.values = new int[8];
+    }
+
+    public SimpleListInt(int len) {
+        this.values = new int[len];
     }
 
     public SimpleListInt(int[] values) {
@@ -17,6 +21,11 @@ public class SimpleListInt {
             if(val == 0) break;
             this.length++;
         }
+    }
+
+    public SimpleListInt(int[] values, int length) {
+        this.values = values;
+        this.length = length;
     }
 
     public int getLength() {
@@ -49,5 +58,15 @@ public class SimpleListInt {
             newList[i] = this.values[i];
         }
         this.values = newList;
+    }
+
+    // http://stackoverflow.com/questions/18895915/how-to-sort-an-array-of-objects-in-java
+    public int compareTo(SimpleListInt simpleListInt) {
+        return this.length < simpleListInt.length ? -1 : this.length > simpleListInt.length ? 1 : 0;
+    }
+
+    @Override
+    public String toString() {
+        return this.values.toString();
     }
 }

@@ -3,8 +3,14 @@ package com.stuartsullivan.ir;
 
 import com.google.gson.Gson;
 import com.stuartsullivan.ir.models.Document;
+import com.stuartsullivan.ir.models.PostingList;
+import com.stuartsullivan.ir.models.Vocabulary;
+import com.stuartsullivan.ir.utils.Lexiconer;
+import com.stuartsullivan.ir.utils.SimpleListInt;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by stuart on 1/13/17.
@@ -44,6 +50,39 @@ public class DocumentLookup {
             e.printStackTrace();
             return;
         }
+    }
+
+    public static SimpleListInt QueryAnd(String path, String query, PostingList postings, Vocabulary vocabulary) {
+        ArrayList<String> tokens = Lexiconer.Tokenize(query);
+        SimpleListInt tokenIds = new SimpleListInt();
+        for(String token: tokens) {
+            tokenIds.add(vocabulary.getId(token));
+        }
+        SimpleListInt[] foundPostings = new SimpleListInt[tokenIds.getLength()];
+        int count = 0;
+        for(int i = 0; i < tokenIds.getLength(); i++) {
+            foundPostings[count] = postings.get(tokenIds.get(i));
+            count++;
+        }
+        Arrays.sort(foundPostings);
+        SimpleListInt check = foundPostings[0];
+        SimpleListInt results = new SimpleListInt(2);
+        for(count = 1; count < tokenIds.getLength(); count++) {
+            results = new SimpleListInt(2);
+            int i = 0, j = 0;
+            while(i < check.getLength() && j < foundPostings[count].getLength()) {
+                if(check.get(i) == foundPostings[count].get(j)) {
+                   results.add(check.get(i));
+                   i += 2;
+                   j += 2;
+                } else if(check.get(i) > foundPostings[count].get(j)) {
+                   j+=2;
+                } else {
+                    i+=2;
+                }
+            }
+        }
+        return results;
     }
 
     private static String SearchIndex(String path, String id) throws IOException {

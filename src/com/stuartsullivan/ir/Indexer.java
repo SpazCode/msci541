@@ -35,12 +35,12 @@ public class Indexer {
             }
 
             // Enusre that the destination is new
-//            f = new File(args[1]);
-//            if(f.exists() || !f.getParentFile().isDirectory()) {
-//                System.out.println("Invalid Output: The output must be a valid directory path but must be a new path");
-//                System.exit(1);
-//                return;
-//            }
+            f = new File(args[1]);
+            if(f.exists() || !f.getParentFile().isDirectory()) {
+                System.out.println("Invalid Output: The output must be a valid directory path but must be a new path");
+                System.exit(1);
+                return;
+            }
 
             // Create Vocabulary and PostingLists Objects
             PostingList postings = new PostingList(args[1]);

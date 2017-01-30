@@ -22,6 +22,9 @@ public class Lexiconer {
                 start = end;
             }
         }
+        if(start != end) {
+            tokens.add(sentence.substring(start, end).trim());
+        }
         return tokens;
     }
 

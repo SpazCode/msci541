@@ -20,13 +20,9 @@ public class PostingList {
     }
 
     public PostingList(String path) {
-        this.postings = new SimpleListInt[8];
         this.path = path;
+        this.loadPostingList();
     }
-
-//    public PostingList(SimpleListInt[] postings) {
-//        this.postings = postings;
-//    }
 
     public int getLength() {
         return this.length;

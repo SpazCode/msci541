@@ -21,22 +21,28 @@ public class Lookup {
                 System.out.println(" -> Type: [id or docno]");
                 System.out.println(" -> Query: the thing we are searching");
                 System.exit(1);
+                return;
             }
 
             // Check the Path
             File f = new File(args[0]);
             if(!f.exists() || !f.isDirectory()) {
                 System.out.println("Invalid Path: Please verify that the directory is correct");
+                System.exit(1);
+                return;
             }
 
             // Ensure that the type is correct
             if(!args[1].equals("id") && !args[1].equals("docno")) {
                 System.out.println("Invalid Type: Only [id] and [docno] is valid");
+                System.exit(1);
+                return;
             }
 
             DocumentLookup.Lookup(args[0], args[1], args[2]);
         } catch (Exception e) {
             e.printStackTrace();
+            System.exit(1);
         }
     }
 }
