@@ -1,5 +1,5 @@
 <component name="ArtifactManager">
-  <artifact type="jar" build-on-make="true" name="Lookup.jar">
+  <artifact type="jar" build-on-make="true" name="Lookup:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/Lookup_jar</output-path>
     <root id="archive" name="Lookup.jar">
       <element id="directory" name="META-INF">

@@ -1,9 +1,9 @@
 <component name="ArtifactManager">
-  <artifact type="jar" build-on-make="true" name="Indexer:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/Indexer_jar</output-path>
-    <root id="archive" name="Indexer.jar">
+  <artifact type="jar" name="BooleanAnd:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/BooleanAnd_jar</output-path>
+    <root id="archive" name="QueryBooleanAnd.jar">
       <element id="directory" name="META-INF">
-        <element id="file-copy" path="$PROJECT_DIR$/src/indexer/META-INF/MANIFEST.MF" />
+        <element id="file-copy" path="$PROJECT_DIR$/src/BooleanAnd/META-INF/MANIFEST.MF" />
       </element>
       <element id="module-output" name="MSCI541Assignments" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/gson-2.3.1.jar" path-in-jar="/" />

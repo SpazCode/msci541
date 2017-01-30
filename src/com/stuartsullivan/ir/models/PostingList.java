@@ -21,6 +21,7 @@ public class PostingList {
 
     public PostingList(String path) {
         this.path = path;
+        this.postings = new SimpleListInt[8];
         this.loadPostingList();
     }
 
