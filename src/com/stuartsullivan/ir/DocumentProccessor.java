@@ -29,7 +29,15 @@ import java.util.zip.GZIPInputStream;
  * > Updating the internal id index of Documents
  */
 public class DocumentProccessor {
-    public static void extractCorpus(String source, String output, Vocabulary vocabulary, PostingList postings) {
+    // Regex Explained - https://www.tutorialspoint.com/java/java_regular_expressions.htm
+    // Moved here to help performance
+    private final Pattern docnoTag = Pattern.compile("<DOCNO>(.*)</DOCNO>");
+    private final Pattern textTag = Pattern.compile("<TEXT>(.*)</TEXT>");
+    private final Pattern headlineTag = Pattern.compile("<HEADLINE>(.*)</HEADLINE>");
+    private final Pattern byLineTag = Pattern.compile("<BYLINE>(.*)</BYLINE>");
+    private final Pattern graphicTag = Pattern.compile("<GRAPHIC>(.*)</GRAPHIC>");
+
+    public void extractCorpus(String source, String output, Vocabulary vocabulary, PostingList postings) {
         try {
             resetIndex();
             // Load the corpus archive
@@ -66,20 +74,12 @@ public class DocumentProccessor {
         }
     }
 
-    private static void processDocument(String doc, String output, int id, Vocabulary vocabulary, PostingList postings) {
+    private void processDocument(String doc, String output, int id, Vocabulary vocabulary, PostingList postings) {
         try {
-            System.out.print("Processing: " + id + "\n");
             // Create new Document
             Document docObj = new Document();
             // Populate Document
             docObj.setRaw(doc);
-
-            // Regex Explained - https://www.tutorialspoint.com/java/java_regular_expressions.htm
-            Pattern docnoTag = Pattern.compile("<DOCNO>(.*)</DOCNO>");
-            Pattern textTag = Pattern.compile("<TEXT>(.*)</TEXT>");
-            Pattern headlineTag = Pattern.compile("<HEADLINE>(.*)</HEADLINE>");
-            Pattern byLineTag = Pattern.compile("<BYLINE>(.*)</BYLINE>");
-            Pattern graphicTag = Pattern.compile("<GRAPHIC>(.*)</GRAPHIC>");
 
             // Extract important tags
             doc = doc.replace("\n", "");
@@ -116,14 +116,14 @@ public class DocumentProccessor {
             fwr.close();
             updateIndex(docObj, output);
             // Output the Internal ID 
-            System.out.print("Processed: " + docObj.getDocid() + "\n");
+            System.out.print(".");
         } catch (IOException e) {
             System.out.println("Error parsing document");
             e.printStackTrace();
         }
     }
 
-    private static ArrayList<String> tokenizeText(String[] body) {
+    private ArrayList<String> tokenizeText(String[] body) {
         String text = "";
         for (String section : body) {
             text = text.concat(" ").concat(section);
@@ -131,7 +131,7 @@ public class DocumentProccessor {
         return Lexiconer.Tokenize(text);
     }
 
-    private static SimpleListInt tokenIds(ArrayList<String> tokens, Vocabulary vocabulary) {
+    private SimpleListInt tokenIds(ArrayList<String> tokens, Vocabulary vocabulary) {
         SimpleListInt tokenIds = new SimpleListInt();
         for(String token: tokens) {
             tokenIds.add(vocabulary.getId(token));
@@ -139,7 +139,7 @@ public class DocumentProccessor {
         return tokenIds;
     }
 
-    private static void constructPostingList(PostingList postings, Vocabulary vocabulary, int docId, String[] content) {
+    private void constructPostingList(PostingList postings, Vocabulary vocabulary, int docId, String[] content) {
         ArrayList<String> tokens = tokenizeText(content);
         SimpleListInt tokenIds = tokenIds(tokens, vocabulary);
         HashMap<Integer, Integer> tokenCounts = Lexiconer.CountTokens(tokenIds.getValues());
@@ -153,7 +153,7 @@ public class DocumentProccessor {
         }
     }
 
-    private static void updateIndex(Document doc, String output) {
+    private void updateIndex(Document doc, String output) {
         try {
             // Load the index file
             String INDEXPATH = output + "/index/index.csv";
@@ -173,7 +173,7 @@ public class DocumentProccessor {
     }
 
     // Function for updating the indexed data
-    private static void resetIndex() {
+    private void resetIndex() {
         try {
             String INDEXPATH = "index/index.csv";
             File f = new File(INDEXPATH);
@@ -186,14 +186,14 @@ public class DocumentProccessor {
         }
     }
 
-    private static String createPath(String docno) {
+    private String createPath(String docno) {
         String[] docSegments = docno.split("-");
         String path = "data/";
         path = path + docSegments[0].substring(0, 2) + "/" + docSegments[0].substring(6, 8) + "/" + docSegments[0].substring(2, 4) + "/" + docSegments[0].substring(4, 6)  + "/" + docSegments[1] + ".json";
         return path;
     }
 
-    private static String buildDate(String docno) {
+    private String buildDate(String docno) {
         // Extract Date peices from DOCNO
         String[] docSegments = docno.split("-");
         int yy = 1900 + Integer.parseInt(docSegments[0].substring(6, 8));

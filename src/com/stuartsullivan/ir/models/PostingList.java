@@ -130,7 +130,6 @@ public class PostingList {
             int offsets = 0;
             for(int i = 0; i < this.length; i++) {
                 byte[] listData = this.convertToByteArray(i);
-                System.out.println("" + i);
                 offsets += listData.length;
                 outIndex.writeInt(offsets);
                 outList.write(listData);

@@ -14,6 +14,7 @@ import java.io.File;
  */
 public class Indexer {
     public static void main(String[] args) {
+        final long startTime = System.currentTimeMillis();
         try {
             // Ensure enough arguments are entered
             if(args.length < 2) {
@@ -46,10 +47,13 @@ public class Indexer {
             PostingList postings = new PostingList(args[1]);
             Vocabulary vocabulary = new Vocabulary(args[1]);
             // Process the Documents
-            DocumentProccessor.extractCorpus(args[0], args[1], vocabulary, postings);
+            DocumentProccessor processor = new DocumentProccessor();
+            processor.extractCorpus(args[0], args[1], vocabulary, postings);
             // Update the Vocabulary and PostingList
             vocabulary.UpdateDictionary();
             postings.updatePostingList();
+            final long endTime = System.currentTimeMillis();
+            System.out.print((endTime - startTime)/1000 + " secs\n");
         } catch (Exception e) {
             e.printStackTrace();
         }

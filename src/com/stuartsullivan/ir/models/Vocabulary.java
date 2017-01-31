@@ -32,6 +32,12 @@ public class Vocabulary {
         }
     }
 
+    public int get(String token) {
+        if (dictionary.containsKey(token))
+            return dictionary.get(token);
+        else return -1;
+    }
+
     public int getMaxKey() {
         int max = 0;
         for (int value : dictionary.values()) {

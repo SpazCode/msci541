@@ -13,6 +13,7 @@ import java.io.*;
 public class QueryBooleanAnd {
     public static void main(String[] args) {
         try {
+            final long startTime = System.currentTimeMillis();
             // Ensure enough arguments are entered
             if(args.length < 3) {
                 // TODO Add Help Message
@@ -26,20 +27,21 @@ public class QueryBooleanAnd {
             }
 
             // Ensure that the path to the index is valid
-            String indexPath = args[0];
+            String indexPath = args[0].trim();
             File f = new File(indexPath);
             if(!f.exists() || !f.isDirectory()) {
                 System.out.println("Invalid Path: Please verify that the directory is correct");
             }
 
             // Ensure that the path to the query is valid
-            f = new File(args[1]);
+            f = new File(args[1].trim());
             if(!f.exists() || !f.isFile()) {
                 System.out.println("Invalid Query Text: Please verify that the directory is correct");
             }
 
-            String outputPath = args[2];
-            BufferedWriter bfw = new BufferedWriter(new FileWriter(outputPath));
+            String outputPath = args[2].trim();
+            File output = new File(outputPath);
+            BufferedWriter bfw = new BufferedWriter(new FileWriter(output));
             BufferedReader bfr = new BufferedReader(new FileReader(f));
             PostingList postings = new PostingList(indexPath);
             Vocabulary vocabulary = new Vocabulary(indexPath);
@@ -52,12 +54,14 @@ public class QueryBooleanAnd {
                 int count = 0;
                 int maxScore = res.getLength();
                 for(count = 0; count < maxScore; count++) {
-                    bfw.write(topicId +"\t"+ docIndex.get(res.get(count)) +"\t"+ (count+1) +"\t"+
+                    bfw.write(topicId +"\t"+ "Q0" +"\t"+ docIndex.get(res.get(count)) +"\t"+ (count+1) +"\t"+
                             (maxScore-count) +"\t"+ "spasulliAND\n");
                 }
             }
             bfr.close();
             bfw.close();
+            final long endTime = System.currentTimeMillis();
+            System.out.print((endTime - startTime)/1000 + " secs\n");
         } catch(Exception e) {
             e.printStackTrace();
             System.exit(1);

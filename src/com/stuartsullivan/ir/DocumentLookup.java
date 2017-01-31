@@ -56,7 +56,8 @@ public class DocumentLookup {
         ArrayList<String> tokens = Lexiconer.Tokenize(query);
         SimpleListInt tokenIds = new SimpleListInt();
         for(String token: tokens) {
-            tokenIds.add(vocabulary.getId(token));
+            if(vocabulary.get(token) >= 0)
+                tokenIds.add(vocabulary.get(token));
         }
         SimpleListInt[] foundPostings = new SimpleListInt[tokenIds.getLength()];
         int count = 0;
@@ -65,21 +66,30 @@ public class DocumentLookup {
             count++;
         }
         Arrays.sort(foundPostings);
-        SimpleListInt check = foundPostings[0];
         SimpleListInt results = new SimpleListInt(2);
-        for(count = 1; count < tokenIds.getLength(); count++) {
-            results = new SimpleListInt(2);
-            int i = 0, j = 0;
-            while(i < check.getLength() && j < foundPostings[count].getLength()) {
-                if(check.get(i) == foundPostings[count].get(j)) {
-                   results.add(check.get(i));
-                   i += 2;
-                   j += 2;
-                } else if(check.get(i) > foundPostings[count].get(j)) {
-                   j+=2;
-                } else {
-                    i+=2;
+        SimpleListInt check = new SimpleListInt(foundPostings[0].getLength()/2);
+        for(int i = 0; i < foundPostings[0].getLength(); i+=2) {
+            check.add(foundPostings[0].get(i));
+        }
+        if (foundPostings.length <= 1) {
+            return check;
+        } else {
+            for (count = 1; count < tokenIds.getLength(); count++) {
+                results = new SimpleListInt(2);
+                int i = 0;
+                int j = 0;
+                while (i < check.getLength() && j < foundPostings[count].getLength()) {
+                    if (check.get(i) == foundPostings[count].get(j)) {
+                        results.add(check.get(i));
+                        i += 1;
+                        j += 2;
+                    } else if (check.get(i) > foundPostings[count].get(j)) {
+                        j += 2;
+                    } else {
+                        i += 1;
+                    }
                 }
+                check = results;
             }
         }
         return results;

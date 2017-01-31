@@ -11,6 +11,7 @@ import java.io.File;
  */
 public class Lookup {
     public static void main(String[] args) {
+        final long startTime = System.currentTimeMillis();
         try {
             // Verify the arguments
             if(args.length < 3) {
@@ -38,8 +39,10 @@ public class Lookup {
                 System.exit(1);
                 return;
             }
-
+            // Do the Lookup
             DocumentLookup.Lookup(args[0], args[1], args[2]);
+            final long endTime = System.currentTimeMillis();
+            System.out.print((endTime - startTime)/1000 + " secs\n");
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
