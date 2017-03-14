@@ -3,14 +3,18 @@ package com.stuartsullivan.ir;
 
 import com.google.gson.Gson;
 import com.stuartsullivan.ir.models.Document;
+import com.stuartsullivan.ir.models.DocumentIndex;
 import com.stuartsullivan.ir.models.PostingList;
 import com.stuartsullivan.ir.models.Vocabulary;
+import com.stuartsullivan.ir.utils.BM25;
 import com.stuartsullivan.ir.utils.Lexiconer;
 import com.stuartsullivan.ir.utils.SimpleListInt;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Created by stuart on 1/13/17.
@@ -32,7 +36,7 @@ public class DocumentLookup {
                 return;
             }
             // Load the Document Store
-            Document doc = LoadDocument(path, query);
+            Document doc = DocumentIndex.LoadDocument(path, query);
             // If no document was loaded return an error
             if(doc == null) {
                 System.out.println("No Document Found with DOCNO: " + query);
@@ -95,6 +99,19 @@ public class DocumentLookup {
         return results;
     }
 
+    public static HashMap<Integer, Float> BM25Search(String query, Vocabulary vocab, PostingList postings, DocumentIndex index, BM25 bm25) {
+        SimpleListInt tokenIds = Lexiconer.TokenIds(Lexiconer.Tokenize(query), vocab);
+        HashMap<Integer, Float> docScores = new HashMap<Integer, Float>();
+        int token, i, j;
+        for(i = 0; i < tokenIds.getLength(); i++) {
+            token = tokenIds.get(i);
+            for(j = 0; j < postings.get(token).getLength(); j+=2) {
+                docScores.put(j, bm25.score(postings, vocab, index.getDocCount(), index.LoadDocument(postings.get(token).get(j)), query));
+            }
+        }
+        return docScores;
+    }
+
     private static String SearchIndex(String path, String id) throws IOException {
         // Load the index file
         File f = new File(path + "/index/index.csv");
@@ -112,35 +129,5 @@ public class DocumentLookup {
         }
         // Return null if no matching ID was found
         return null;
-    }
-
-    private static Document LoadDocument(String path, String docno) {
-        try {
-            // Build the path to the document based on DOCNO
-            String ext = createPath(docno);
-            // Load the file
-            File f = new File(path + "/" + ext);
-            FileReader fr = new FileReader(f);
-            // Load the JSON file into the Document Object
-            // Source: https://sites.google.com/site/gson/gson-user-guide
-            Gson gson = new Gson();
-            Document doc = gson.fromJson(fr, Document.class);
-            return doc;
-        } catch (FileNotFoundException e) {
-            // Return Null if no file found
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private static String createPath(String docno) {
-        // Build the path to the file using substings of the DOCNO
-        // /LA/YY/MM/DD/FILENO.json
-        String[] docSegments = docno.split("-");
-        String path = "data/";
-        path = path + docSegments[0].substring(0, 2) + "/" + docSegments[0].substring(6, 8) + "/" +
-                docSegments[0].substring(2, 4) + "/" + docSegments[0].substring(4, 6)  + "/" +
-                docSegments[1] + ".json";
-        return path;
     }
 }

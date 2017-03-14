@@ -13,10 +13,11 @@ public class Document {
     private String text = "";
     private String graphic = "";
     private String docno = "";
-    private String docid = "";
+    private int docid = 0;
     private String date = "";
     private String headline = "";
     private String byLine = "";
+    private int wordcount = 0;
 
     public Document() {
     }
@@ -77,11 +78,19 @@ public class Document {
         this.byLine = _byLine.replace("<P>", "").replace("</P>", "").trim();
     }
 
-    public String getDocid() {
+    public int getDocid() {
         return docid;
     }
 
-    public void setDocid(String _docid) {
-        this.docid = _docid.replace("<P>", "").replace("</P>", "").trim();
+    public void setDocid(int _docid) {
+        this.docid = _docid;
+    }
+
+    public int getWordcount() {
+        return wordcount;
+    }
+
+    public void setWordcount(int wordcount) {
+        this.wordcount = wordcount;
     }
 }

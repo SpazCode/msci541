@@ -91,7 +91,7 @@ public class DocumentProccessor {
 
             // Load the rest of the doc data
             if(docnoMatch.find()) docObj.setDocno(docnoMatch.group(1));
-            docObj.setDocid("" + id);
+            docObj.setDocid(id);
             docObj.setDate(buildDate(docObj.getDocno()));
             if(graphicMatch.find()) docObj.setGraphic(graphicMatch.group(1));
             if(headlineMatch.find()) docObj.setHeadline(headlineMatch.group(1));
@@ -99,8 +99,9 @@ public class DocumentProccessor {
             if(byLineMatch.find()) docObj.setByLine(byLineMatch.group(1));
 
             // Tokenize the text
-            constructPostingList(postings, vocabulary, id,
+            int count = constructPostingList(postings, vocabulary, id,
                     new String[] {docObj.getText(), docObj.getGraphic(), docObj.getHeadline()});
+            docObj.setWordcount(count);
             // Save the Document
             // http://www.mkyong.com/java/how-to-enable-pretty-print-json-output-gson/
             Gson gson =  new GsonBuilder().setPrettyPrinting().create();
@@ -139,7 +140,7 @@ public class DocumentProccessor {
         return tokenIds;
     }
 
-    private void constructPostingList(PostingList postings, Vocabulary vocabulary, int docId, String[] content) {
+    private int constructPostingList(PostingList postings, Vocabulary vocabulary, int docId, String[] content) {
         ArrayList<String> tokens = tokenizeText(content);
         SimpleListInt tokenIds = tokenIds(tokens, vocabulary);
         HashMap<Integer, Integer> tokenCounts = Lexiconer.CountTokens(tokenIds.getValues());
@@ -151,6 +152,7 @@ public class DocumentProccessor {
             System.out.println("" + postings.getLength());
             e.printStackTrace();
         }
+        return tokens.size();
     }
 
     private void updateIndex(Document doc, String output) {

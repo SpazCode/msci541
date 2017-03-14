@@ -21,6 +21,7 @@ public class Vocabulary {
         this.nextId = getMaxKey();
     }
 
+    // Get id for a token and create new id for new tokens
     public int getId(String token) {
         if (dictionary.containsKey(token))
             return dictionary.get(token);
@@ -32,12 +33,14 @@ public class Vocabulary {
         }
     }
 
+    // Get id for token
     public int get(String token) {
         if (dictionary.containsKey(token))
             return dictionary.get(token);
         else return -1;
     }
 
+    // Figure out what the highest key
     public int getMaxKey() {
         int max = 0;
         for (int value : dictionary.values()) {
