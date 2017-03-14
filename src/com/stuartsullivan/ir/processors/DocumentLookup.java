@@ -1,5 +1,5 @@
 
-package com.stuartsullivan.ir;
+package com.stuartsullivan.ir.processors;
 
 import com.google.gson.Gson;
 import com.stuartsullivan.ir.models.Document;

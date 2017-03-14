@@ -2,6 +2,7 @@ package com.stuartsullivan.ir;
 
 import com.stuartsullivan.ir.models.PostingList;
 import com.stuartsullivan.ir.models.Vocabulary;
+import com.stuartsullivan.ir.processors.DocumentProccessor;
 
 import java.io.File;
 

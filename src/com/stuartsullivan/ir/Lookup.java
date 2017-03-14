@@ -1,5 +1,7 @@
 package com.stuartsullivan.ir;
 
+import com.stuartsullivan.ir.processors.DocumentLookup;
+
 import java.io.File;
 
 /**
