@@ -11,7 +11,7 @@ import java.util.HashMap;
  */
 public class Lexiconer {
     private static PorterStemer stemer = new PorterStemer();
-    public static ArrayList<String> Tokenize(String sentence) {
+    public static ArrayList<String> Tokenize(String sentence, boolean stem) {
         sentence = sentence.toLowerCase();
         ArrayList<String> tokens = new ArrayList<String>();
         int start = 0;
@@ -19,8 +19,10 @@ public class Lexiconer {
         for(char c: sentence.toCharArray()) {
             if (start != end && !Character.isDigit(c) && !Character.isLetter(c)) {
                 String token = sentence.substring(start, end).trim();
-                stemer.set(token);
-                tokens.add(stemer.toString());
+                if (stem) {
+                    stemer.set(token);
+                    tokens.add(stemer.toString());
+                } else tokens.add(token);
                 start = end;
             }
             end++;
@@ -36,13 +38,14 @@ public class Lexiconer {
 
     public static HashMap<Integer, Integer> CountTokens(int[] tokenIds) {
         HashMap<Integer, Integer> termCounts = new HashMap<Integer, Integer>();
-        for(int id: tokenIds) {
-            if(termCounts.containsKey(id)) {
-                int val = termCounts.get(id);
+        int i;
+        for(i = 0; i < tokenIds.length; i++) {
+            if(termCounts.containsKey(tokenIds[i])) {
+                int val = termCounts.get(tokenIds[i]);
                 val += 1;
-                termCounts.put(id, val);
+                termCounts.put(tokenIds[i], val);
             } else {
-                termCounts.put(id, 1);
+                termCounts.put(tokenIds[i], 1);
             }
         }
         return termCounts;

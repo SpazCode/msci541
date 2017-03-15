@@ -7,6 +7,7 @@ import com.stuartsullivan.ir.models.DocumentIndex;
 import com.stuartsullivan.ir.models.PostingList;
 import com.stuartsullivan.ir.models.Vocabulary;
 import com.stuartsullivan.ir.utils.BM25;
+import com.stuartsullivan.ir.utils.BM25Scores;
 import com.stuartsullivan.ir.utils.Lexiconer;
 import com.stuartsullivan.ir.utils.SimpleListInt;
 
@@ -57,7 +58,7 @@ public class DocumentLookup {
     }
 
     public static SimpleListInt QueryAnd(String path, String query, PostingList postings, Vocabulary vocabulary) {
-        ArrayList<String> tokens = Lexiconer.Tokenize(query);
+        ArrayList<String> tokens = Lexiconer.Tokenize(query, false);
         SimpleListInt tokenIds = new SimpleListInt();
         for(String token: tokens) {
             if(vocabulary.get(token) >= 0)
@@ -99,17 +100,25 @@ public class DocumentLookup {
         return results;
     }
 
-    public static HashMap<Integer, Float> BM25Search(String query, Vocabulary vocab, PostingList postings, DocumentIndex index, BM25 bm25) {
-        SimpleListInt tokenIds = Lexiconer.TokenIds(Lexiconer.Tokenize(query), vocab);
-        HashMap<Integer, Float> docScores = new HashMap<Integer, Float>();
-        int token, i, j;
+    public static BM25Scores[] BM25Search(String query, Vocabulary vocab, PostingList postings, DocumentIndex index, BM25 bm25) {
+        SimpleListInt tokenIds = Lexiconer.TokenIds(Lexiconer.Tokenize(query, false), vocab);
+        HashMap<Integer, BM25Scores> docScores = new HashMap<Integer, BM25Scores>();
+        int token, i, j, docid ;
+        float score;
+        BM25Scores scoreObj;
         for(i = 0; i < tokenIds.getLength(); i++) {
             token = tokenIds.get(i);
             for(j = 0; j < postings.get(token).getLength(); j+=2) {
-                docScores.put(j, bm25.score(postings, vocab, index.getDocCount(), index.LoadDocument(postings.get(token).get(j)), query));
+                docid = postings.get(token).get(j);
+                if (docScores.containsKey(docid)) continue;
+                score = bm25.score(postings, vocab, index.getDocCount(), index.LoadDocument(docid), query);
+                scoreObj = new BM25Scores(docid, index.get(docid), score);
+                docScores.put(docid, scoreObj);
             }
         }
-        return docScores;
+        BM25Scores[] scores = docScores.values().toArray(new BM25Scores[docScores.values().size()]);
+        Arrays.sort(scores);
+        return scores;
     }
 
     private static String SearchIndex(String path, String id) throws IOException {
