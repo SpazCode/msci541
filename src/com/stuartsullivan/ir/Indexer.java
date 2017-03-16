@@ -1,8 +1,9 @@
 package com.stuartsullivan.ir;
 
+import com.stuartsullivan.ir.models.CollectionData;
 import com.stuartsullivan.ir.models.PostingList;
 import com.stuartsullivan.ir.models.Vocabulary;
-import com.stuartsullivan.ir.processors.DocumentProccessor;
+import com.stuartsullivan.ir.processors.DocumentProcessor;
 
 import java.io.File;
 
@@ -47,12 +48,16 @@ public class Indexer {
             // Create Vocabulary and PostingLists Objects
             PostingList postings = new PostingList(args[1]);
             Vocabulary vocabulary = new Vocabulary(args[1]);
+            // Create the CollectionData Object
+            CollectionData about = new CollectionData();
+            about.setStemmedSet(true);
             // Process the Documents
-            DocumentProccessor processor = new DocumentProccessor();
-            processor.extractCorpus(args[0], args[1], vocabulary, postings);
+            DocumentProcessor processor = new DocumentProcessor();
+            processor.extractCorpus(args[0], args[1], vocabulary, postings, about, about.isStemmedSet());
             // Update the Vocabulary and PostingList
             vocabulary.UpdateDictionary();
             postings.updatePostingList();
+            CollectionData.SaveCollectionData(args[1], about);
             final long endTime = System.currentTimeMillis();
             System.out.print((endTime - startTime)/1000 + " secs\n");
         } catch (Exception e) {

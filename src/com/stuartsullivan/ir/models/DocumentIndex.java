@@ -93,7 +93,7 @@ public class DocumentIndex {
         }
     }
 
-    private static String createPath(String docno) {
+    public static String createPath(String docno) {
         // Build the path to the file using substings of the DOCNO
         // /LA/YY/MM/DD/FILENO.json
         String[] docSegments = docno.split("-");

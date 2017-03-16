@@ -2,9 +2,7 @@ package com.stuartsullivan.ir.processors;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.stuartsullivan.ir.models.Document;
-import com.stuartsullivan.ir.models.PostingList;
-import com.stuartsullivan.ir.models.Vocabulary;
+import com.stuartsullivan.ir.models.*;
 import com.stuartsullivan.ir.utils.Lexiconer;
 import com.stuartsullivan.ir.utils.SimpleListInt;
 
@@ -28,7 +26,7 @@ import java.util.zip.GZIPInputStream;
  * > Saving the data in the specified file structure
  * > Updating the internal id index of Documents
  */
-public class DocumentProccessor {
+public class DocumentProcessor {
     // Regex Explained - https://www.tutorialspoint.com/java/java_regular_expressions.htm
     // Moved here to help performance
     private final Pattern docnoTag = Pattern.compile("<DOCNO>(.*)</DOCNO>");
@@ -37,7 +35,7 @@ public class DocumentProccessor {
     private final Pattern byLineTag = Pattern.compile("<BYLINE>(.*)</BYLINE>");
     private final Pattern graphicTag = Pattern.compile("<GRAPHIC>(.*)</GRAPHIC>");
 
-    public void extractCorpus(String source, String output, Vocabulary vocabulary, PostingList postings) {
+    public void extractCorpus(String source, String output, Vocabulary vocabulary, PostingList postings, CollectionData about, boolean stem) {
         try {
             resetIndex();
             // Load the corpus archive
@@ -58,7 +56,7 @@ public class DocumentProccessor {
                 if (line.contains("</DOC>")) {
                     // Send document segment to processor once end tag is found
                     // TODO Make Processor Multithreaded Maybe?!?
-                    processDocument(segment, output, id, vocabulary, postings);
+                    processDocument(segment, output, id, vocabulary, postings, about, stem);
                     segment = "";
                     // Incrament ID
                     id++;
@@ -74,7 +72,7 @@ public class DocumentProccessor {
         }
     }
 
-    private void processDocument(String doc, String output, int id, Vocabulary vocabulary, PostingList postings) {
+    private void processDocument(String doc, String output, int id, Vocabulary vocabulary, PostingList postings, CollectionData about, boolean stem) {
         try {
             // Create new Document
             Document docObj = new Document();
@@ -100,13 +98,13 @@ public class DocumentProccessor {
 
             // Tokenize the text
             int count = constructPostingList(postings, vocabulary, id,
-                    new String[] {docObj.getText(), docObj.getGraphic(), docObj.getHeadline()});
+                    new String[] {docObj.getText(), docObj.getGraphic(), docObj.getHeadline()}, stem);
             docObj.setWordcount(count);
             // Save the Document
             // http://www.mkyong.com/java/how-to-enable-pretty-print-json-output-gson/
-            Gson gson =  new GsonBuilder().setPrettyPrinting().create();
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
             String jsonString = gson.toJson(docObj);
-            String path = createPath(docObj.getDocno());
+            String path = DocumentIndex.createPath(docObj.getDocno());
             File f = new File(output + "/" + path);
             // http://stackoverflow.com/questions/2833853/create-whole-path-automatically-when-writing-to-a-new-file
             // Build/Ensure directory structure
@@ -115,6 +113,7 @@ public class DocumentProccessor {
             FileWriter fwr = new FileWriter(f);
             fwr.write(jsonString);
             fwr.close();
+            about.updateAverageWordCount(docObj.getWordcount());
             updateIndex(docObj, output);
             // Output the Internal ID 
             System.out.print(".");
@@ -124,12 +123,12 @@ public class DocumentProccessor {
         }
     }
 
-    private ArrayList<String> tokenizeText(String[] body) {
+    private ArrayList<String> tokenizeText(String[] body, boolean stem) {
         String text = "";
         for (String section : body) {
             text = text.concat(" ").concat(section);
         }
-        return Lexiconer.Tokenize(text);
+        return Lexiconer.Tokenize(text, stem);
     }
 
     private SimpleListInt tokenIds(ArrayList<String> tokens, Vocabulary vocabulary) {
@@ -140,8 +139,8 @@ public class DocumentProccessor {
         return tokenIds;
     }
 
-    private int constructPostingList(PostingList postings, Vocabulary vocabulary, int docId, String[] content) {
-        ArrayList<String> tokens = tokenizeText(content);
+    private int constructPostingList(PostingList postings, Vocabulary vocabulary, int docId, String[] content, boolean stem) {
+        ArrayList<String> tokens = tokenizeText(content, stem);
         SimpleListInt tokenIds = tokenIds(tokens, vocabulary);
         HashMap<Integer, Integer> tokenCounts = Lexiconer.CountTokens(tokenIds.getValues());
         try {
@@ -186,13 +185,6 @@ public class DocumentProccessor {
             System.out.println("No index to reset");
             // e.printStackTrace();
         }
-    }
-
-    private String createPath(String docno) {
-        String[] docSegments = docno.split("-");
-        String path = "data/";
-        path = path + docSegments[0].substring(0, 2) + "/" + docSegments[0].substring(6, 8) + "/" + docSegments[0].substring(2, 4) + "/" + docSegments[0].substring(4, 6)  + "/" + docSegments[1] + ".json";
-        return path;
     }
 
     private String buildDate(String docno) {

@@ -21,6 +21,7 @@ public class Lexiconer {
                 String token = sentence.substring(start, end).trim();
                 if (stem) {
                     stemer.set(token);
+                    stemer.stem();
                     tokens.add(stemer.toString());
                 } else tokens.add(token);
                 start = end;
