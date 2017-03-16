@@ -1,5 +1,6 @@
 package com.stuartsullivan.ir;
 
+import com.stuartsullivan.ir.models.CollectionData;
 import com.stuartsullivan.ir.models.DocumentIndex;
 import com.stuartsullivan.ir.models.PostingList;
 import com.stuartsullivan.ir.models.Vocabulary;
@@ -48,7 +49,8 @@ public class BM25Search {
             BufferedReader bfr = new BufferedReader(new FileReader(f));
             PostingList postings = new PostingList(indexPath);
             Vocabulary vocabulary = new Vocabulary(indexPath);
-            BM25 bm25 = new BM25();
+            CollectionData about = CollectionData.LoadCollectionData(indexPath);
+            BM25 bm25 = new BM25(0.75f, 1.2f, 7f, about.getAverageWordCount());
             DocumentIndex docIndex = new DocumentIndex(indexPath);
             String line = "";
             StringBuilder builder = new StringBuilder();
@@ -57,7 +59,7 @@ public class BM25Search {
                 String topicId = line.split(":")[0];
                 String topicText = line.split(":")[1];
                 System.out.println(topicId);
-                BM25Scores[] res = DocumentLookup.BM25Search(topicText, vocabulary, postings, docIndex, bm25);
+                BM25Scores[] res = DocumentLookup.BM25Search(topicText, about.isStemmedSet(), vocabulary, postings, docIndex, bm25);
                 int rank = 1;
                 for(rank = 0; rank < Math.min(1000, res.length); rank++) {
                     builder.setLength(0);

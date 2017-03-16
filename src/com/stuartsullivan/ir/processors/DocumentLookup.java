@@ -2,10 +2,7 @@
 package com.stuartsullivan.ir.processors;
 
 import com.google.gson.Gson;
-import com.stuartsullivan.ir.models.Document;
-import com.stuartsullivan.ir.models.DocumentIndex;
-import com.stuartsullivan.ir.models.PostingList;
-import com.stuartsullivan.ir.models.Vocabulary;
+import com.stuartsullivan.ir.models.*;
 import com.stuartsullivan.ir.utils.BM25;
 import com.stuartsullivan.ir.utils.BM25Scores;
 import com.stuartsullivan.ir.utils.Lexiconer;
@@ -100,8 +97,8 @@ public class DocumentLookup {
         return results;
     }
 
-    public static BM25Scores[] BM25Search(String query, Vocabulary vocab, PostingList postings, DocumentIndex index, BM25 bm25) {
-        SimpleListInt tokenIds = Lexiconer.TokenIds(Lexiconer.Tokenize(query, false), vocab);
+    public static BM25Scores[] BM25Search(String query, boolean stem, Vocabulary vocab, PostingList postings, DocumentIndex index, BM25 bm25) {
+        SimpleListInt tokenIds = Lexiconer.TokenIds(Lexiconer.Tokenize(query, stem), vocab);
         HashMap<Integer, BM25Scores> docScores = new HashMap<Integer, BM25Scores>();
         int token, i, j, docid ;
         float score;
@@ -111,7 +108,7 @@ public class DocumentLookup {
             for(j = 0; j < postings.get(token).getLength(); j+=2) {
                 docid = postings.get(token).get(j);
                 if (docScores.containsKey(docid)) continue;
-                score = bm25.score(postings, vocab, index.getDocCount(), index.LoadDocument(docid), query);
+                score = bm25.score(postings, vocab, index.getDocCount(), index.LoadDocument(docid), stem, query);
                 scoreObj = new BM25Scores(docid, index.get(docid), score);
                 docScores.put(docid, scoreObj);
             }

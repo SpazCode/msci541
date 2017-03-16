@@ -24,6 +24,7 @@ public class BM25 {
     public BM25() {
 
     }
+
     public BM25(float _b, float _k1, float _k2, float _avgdl) {
         this.b = _b;
         this.k1 = _k1;
@@ -31,9 +32,9 @@ public class BM25 {
         this.avgdl = _avgdl;
     }
 
-    public float score(PostingList postings, Vocabulary vocab, int docCount, Document doc, String query) {
+    public float score(PostingList postings, Vocabulary vocab, int docCount, Document doc, boolean stem, String query) {
         float score = 0.0f;
-        SimpleListInt tokens = Lexiconer.TokenIds(Lexiconer.Tokenize(query, false), vocab);
+        SimpleListInt tokens = Lexiconer.TokenIds(Lexiconer.Tokenize(query, stem), vocab);
         HashMap<Integer, Integer> counts = Lexiconer.CountTokens(tokens.getValues());
         int docsWithTerm, count;
         float fi, tfindoc, tfinque, idf;
