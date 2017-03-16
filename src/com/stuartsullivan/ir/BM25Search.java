@@ -65,9 +65,9 @@ public class BM25Search {
                     builder.setLength(0);
                     builder.append(topicId);
                     builder.append("\tq0\t");
-                    builder.append(rank+1);
-                    builder.append("\t");
                     builder.append(res[rank].getDocno());
+                    builder.append("\t");
+                    builder.append(rank+1);
                     builder.append("\t");
                     builder.append(res[rank].getScore());
                     builder.append("\tspasulliAND\n");

@@ -19,7 +19,7 @@ public class Lexiconer {
         for(char c: sentence.toCharArray()) {
             if (start != end && !Character.isDigit(c) && !Character.isLetter(c)) {
                 String token = sentence.substring(start, end).trim();
-                if (stem) {
+                if (stem || token.length() > 1) {
                     stemer.set(token);
                     stemer.stem();
                     tokens.add(stemer.toString());

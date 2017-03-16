@@ -43,8 +43,8 @@ public class BM25 {
             docsWithTerm = postings.get(tokens.get(i)).getLength()/2;
             fi = Lexiconer.TermFrequencyInDoc(tokens.get(i), doc.getDocid(), postings);
             tfindoc = ((this.k1 + 1) * fi) / (K(doc) + fi);
-            tfinque = ((this.k2 + 1) * count * fi)/(this.k2 + (count*fi));
-            idf = (float) Math.log10((docCount-docsWithTerm+0.5)/(docsWithTerm+0.5));
+            tfinque = ((this.k2 + 1) * count)/(this.k2 + (count));
+            idf = (float) Math.log((docCount-docsWithTerm+0.5)/(docsWithTerm+0.5));
             score += (tfindoc * tfinque * idf);
         }
         return score;
