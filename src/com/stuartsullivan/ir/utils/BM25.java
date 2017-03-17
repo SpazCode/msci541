@@ -1,7 +1,6 @@
 package com.stuartsullivan.ir.utils;
 
 import com.stuartsullivan.ir.models.Document;
-import com.stuartsullivan.ir.models.DocumentIndex;
 import com.stuartsullivan.ir.models.PostingList;
 import com.stuartsullivan.ir.models.Vocabulary;
 

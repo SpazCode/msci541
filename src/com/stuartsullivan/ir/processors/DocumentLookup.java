@@ -1,18 +1,13 @@
 
 package com.stuartsullivan.ir.processors;
 
-import com.google.gson.Gson;
 import com.stuartsullivan.ir.models.*;
-import com.stuartsullivan.ir.utils.BM25;
-import com.stuartsullivan.ir.utils.BM25Scores;
-import com.stuartsullivan.ir.utils.Lexiconer;
-import com.stuartsullivan.ir.utils.SimpleListInt;
+import com.stuartsullivan.ir.utils.*;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 
 /**
  * Created by stuart on 1/13/17.
@@ -97,23 +92,44 @@ public class DocumentLookup {
         return results;
     }
 
-    public static BM25Scores[] BM25Search(String query, boolean stem, Vocabulary vocab, PostingList postings, DocumentIndex index, BM25 bm25) {
+    public static Scores[] BM25Search(String query, boolean stem, Vocabulary vocab, PostingList postings, DocumentIndex index, BM25 bm25) {
         SimpleListInt tokenIds = Lexiconer.TokenIds(Lexiconer.Tokenize(query, stem), vocab);
-        HashMap<Integer, BM25Scores> docScores = new HashMap<Integer, BM25Scores>();
+        HashMap<Integer, Scores> docScores = new HashMap<Integer, Scores>();
         int token, i, j, docid ;
         float score;
-        BM25Scores scoreObj;
+        Scores scoreObj;
         for(i = 0; i < tokenIds.getLength(); i++) {
             token = tokenIds.get(i);
             for(j = 0; j < postings.get(token).getLength(); j+=2) {
                 docid = postings.get(token).get(j);
                 if (docScores.containsKey(docid)) continue;
                 score = bm25.score(postings, vocab, index.getDocCount(), index.LoadDocument(docid), stem, query);
-                scoreObj = new BM25Scores(docid, index.get(docid), score);
+                scoreObj = new Scores(docid, index.get(docid), score);
                 docScores.put(docid, scoreObj);
             }
         }
-        BM25Scores[] scores = docScores.values().toArray(new BM25Scores[docScores.values().size()]);
+        Scores[] scores = docScores.values().toArray(new Scores[docScores.values().size()]);
+        Arrays.sort(scores);
+        return scores;
+    }
+
+    public static Scores[] CosineSearch(String query, boolean stem, Vocabulary vocab, PostingList postings, DocumentIndex index, Cosine cosine) {
+        SimpleListInt tokenIds = Lexiconer.TokenIds(Lexiconer.Tokenize(query, stem), vocab);
+        HashMap<Integer, Scores> docScores = new HashMap<Integer, Scores>();
+        int token, i, j, docid ;
+        float score;
+        Scores scoreObj;
+        for(i = 0; i < tokenIds.getLength(); i++) {
+            token = tokenIds.get(i);
+            for(j = 0; j < postings.get(token).getLength(); j+=2) {
+                docid = postings.get(token).get(j);
+                if (docScores.containsKey(docid)) continue;
+                score = cosine.score(query, stem, index.getDocCount(), index.LoadDocument(docid), vocab, postings);
+                scoreObj = new Scores(docid, index.get(docid), score);
+                docScores.put(docid, scoreObj);
+            }
+        }
+        Scores[] scores = docScores.values().toArray(new Scores[docScores.values().size()]);
         Arrays.sort(scores);
         return scores;
     }

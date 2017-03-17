@@ -3,12 +3,12 @@ package com.stuartsullivan.ir.utils;
 /**
  * Created by stuart on 3/14/17.
  */
-public class BM25Scores implements Comparable<BM25Scores> {
+public class Scores implements Comparable<Scores> {
     private int docid;
     private String docno;
     private float score;
 
-    public BM25Scores(int _docid, String _docno, float _score) {
+    public Scores(int _docid, String _docno, float _score) {
         this.docid = _docid;
         this.docno = _docno;
         this.score = _score;
@@ -38,9 +38,9 @@ public class BM25Scores implements Comparable<BM25Scores> {
         this.score = score;
     }
 
-    public int compareTo(BM25Scores compareScore) {
+    public int compareTo(Scores compareScore) {
 
-        float score = ((BM25Scores) compareScore).getScore();
+        float score = ((Scores) compareScore).getScore();
 
         //ascending order
         return (int) (-1*((this.score - score) / Math.abs(this.score - score)));

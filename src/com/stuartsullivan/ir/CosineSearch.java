@@ -6,14 +6,15 @@ import com.stuartsullivan.ir.models.PostingList;
 import com.stuartsullivan.ir.models.Vocabulary;
 import com.stuartsullivan.ir.processors.DocumentLookup;
 import com.stuartsullivan.ir.utils.BM25;
+import com.stuartsullivan.ir.utils.Cosine;
 import com.stuartsullivan.ir.utils.Scores;
 
 import java.io.*;
 
 /**
- * Created by stuart on 3/14/17.
+ * Created by stuart on 3/16/17.
  */
-public class BM25Search {
+public class CosineSearch {
     public static void main(String[] args) {
         try {
             final long startTime = System.currentTimeMillis();
@@ -49,7 +50,7 @@ public class BM25Search {
             PostingList postings = new PostingList(indexPath);
             Vocabulary vocabulary = new Vocabulary(indexPath);
             CollectionData about = CollectionData.LoadCollectionData(indexPath);
-            BM25 bm25 = new BM25(0.75f, 1.2f, 7f, about.getAverageWordCount());
+            Cosine cosine = new Cosine();
             DocumentIndex docIndex = new DocumentIndex(indexPath);
             String line = "";
             StringBuilder builder = new StringBuilder();
@@ -58,7 +59,7 @@ public class BM25Search {
                 String topicId = line.split(":")[0];
                 String topicText = line.split(":")[1];
                 System.out.println(topicId);
-                Scores[] res = DocumentLookup.BM25Search(topicText, about.isStemmedSet(), vocabulary, postings, docIndex, bm25);
+                Scores[] res = DocumentLookup.CosineSearch(topicText, about.isStemmedSet(), vocabulary, postings, docIndex, cosine);
                 int rank = 1;
                 for(rank = 0; rank < Math.min(1000, res.length); rank++) {
                     builder.setLength(0);

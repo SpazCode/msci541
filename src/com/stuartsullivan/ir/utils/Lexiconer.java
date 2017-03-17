@@ -70,4 +70,8 @@ public class Lexiconer {
         return 0;
     }
 
+    public static int TermFrequencyInCollection(int termId, PostingList postings) {
+        return postings.get(termId).getLength() / 2;
+    }
+
 }
