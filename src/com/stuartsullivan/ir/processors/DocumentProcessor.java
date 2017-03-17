@@ -97,9 +97,9 @@ public class DocumentProcessor {
             if(byLineMatch.find()) docObj.setByLine(byLineMatch.group(1));
 
             // Tokenize the text
-            int count = constructPostingList(postings, vocabulary, id,
-                    new String[] {docObj.getText(), docObj.getGraphic(), docObj.getHeadline()}, stem);
-            docObj.setWordcount(count);
+            ArrayList<String> tokens = tokenizeText(new String[] {docObj.getText(), docObj.getGraphic(), docObj.getHeadline()}, stem);
+            docObj.setWordcounts(constructPostingList(postings, vocabulary, id, tokens));
+            docObj.setWordcount(tokens.size());
             // Save the Document
             // http://www.mkyong.com/java/how-to-enable-pretty-print-json-output-gson/
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -116,7 +116,7 @@ public class DocumentProcessor {
             about.updateAverageWordCount(docObj.getWordcount());
             updateIndex(docObj, output);
             // Output the Internal ID 
-            System.out.print(".");
+            // System.out.print(".");
         } catch (IOException e) {
             System.out.println("Error parsing document");
             e.printStackTrace();
@@ -139,8 +139,7 @@ public class DocumentProcessor {
         return tokenIds;
     }
 
-    private int constructPostingList(PostingList postings, Vocabulary vocabulary, int docId, String[] content, boolean stem) {
-        ArrayList<String> tokens = tokenizeText(content, stem);
+    private HashMap<Integer, Integer> constructPostingList(PostingList postings, Vocabulary vocabulary, int docId, ArrayList<String> tokens) {
         SimpleListInt tokenIds = tokenIds(tokens, vocabulary);
         HashMap<Integer, Integer> tokenCounts = Lexiconer.CountTokens(tokenIds.getValues());
         try {
@@ -151,7 +150,7 @@ public class DocumentProcessor {
             System.out.println("" + postings.getLength());
             e.printStackTrace();
         }
-        return tokens.size();
+        return tokenCounts;
     }
 
     private void updateIndex(Document doc, String output) {

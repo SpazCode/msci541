@@ -1,5 +1,7 @@
 package com.stuartsullivan.ir.models;
 
+import java.util.HashMap;
+
 /**
  * Created by stuart on 1/13/17.
  *
@@ -18,6 +20,7 @@ public class Document {
     private String headline = "";
     private String byLine = "";
     private int wordcount = 0;
+    private HashMap<Integer, Integer> wordcounts = new HashMap<Integer, Integer>();
 
     public Document() {
     }
@@ -92,5 +95,13 @@ public class Document {
 
     public void setWordcount(int wordcount) {
         this.wordcount = wordcount;
+    }
+
+    public int getTermCount(int i) {
+        return wordcounts.get(i);
+    }
+
+    public void setWordcounts(HashMap<Integer, Integer> wordcounts) {
+        this.wordcounts = wordcounts;
     }
 }
