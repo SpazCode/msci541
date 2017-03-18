@@ -4,7 +4,7 @@ import com.stuartsullivan.ir.models.Document;
 import com.stuartsullivan.ir.models.PostingList;
 import com.stuartsullivan.ir.models.Vocabulary;
 
-import java.util.ArrayList;
+
 import java.util.HashMap;
 
 /**
@@ -18,14 +18,18 @@ public class Cosine {
     public float score(String query, boolean stem, int N, Document doc, Vocabulary vocab, PostingList postings) {
         float res = 0;
         double W = 0;
-        int fi, ft, count;
+        int fi, ft, termId;
         SimpleListInt tokens = Lexiconer.TokenIds(Lexiconer.Tokenize(query, stem), vocab);
         HashMap<Integer, Integer> counts = Lexiconer.CountTokens(tokens.getValues());
         for(int i : counts.keySet()) {
-            // ft = counts.get(i);
-            fi = Lexiconer.TermFrequencyInDoc(i, doc.getDocid(), postings);
+            fi = doc.getTermCount(i);
             ft = Lexiconer.TermFrequencyInCollection(i, postings);
             res += calc(fi, N, ft, 2);
+        }
+        for(int i : doc.getTerms()) {
+            termId = i;
+            fi = doc.getTermCount(termId);
+            ft = Lexiconer.TermFrequencyInCollection(termId, postings);
             W += Math.pow(calc(fi, N, ft, 1), 2);
         }
         res = (float) ((1/Math.sqrt(W)) * res);

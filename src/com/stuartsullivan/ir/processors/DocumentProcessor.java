@@ -1,7 +1,5 @@
 package com.stuartsullivan.ir.processors;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.stuartsullivan.ir.models.*;
 import com.stuartsullivan.ir.utils.Lexiconer;
 import com.stuartsullivan.ir.utils.SimpleListInt;
@@ -98,26 +96,16 @@ public class DocumentProcessor {
 
             // Tokenize the text
             ArrayList<String> tokens = tokenizeText(new String[] {docObj.getText(), docObj.getGraphic(), docObj.getHeadline()}, stem);
-            docObj.setWordcounts(constructPostingList(postings, vocabulary, id, tokens));
+            docObj.setTermCounts(constructPostingList(postings, vocabulary, id, tokens));
             docObj.setWordcount(tokens.size());
             // Save the Document
             // http://www.mkyong.com/java/how-to-enable-pretty-print-json-output-gson/
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            String jsonString = gson.toJson(docObj);
-            String path = DocumentIndex.createPath(docObj.getDocno());
-            File f = new File(output + "/" + path);
-            // http://stackoverflow.com/questions/2833853/create-whole-path-automatically-when-writing-to-a-new-file
-            // Build/Ensure directory structure
-            f.getParentFile().mkdirs();
-            // Output the JSON file
-            FileWriter fwr = new FileWriter(f);
-            fwr.write(jsonString);
-            fwr.close();
+            DocumentIndex.SaveDocument(output, docObj);
             about.updateAverageWordCount(docObj.getWordcount());
             updateIndex(docObj, output);
             // Output the Internal ID 
             // System.out.print(".");
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.out.println("Error parsing document");
             e.printStackTrace();
         }

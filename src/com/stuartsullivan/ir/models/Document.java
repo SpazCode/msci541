@@ -1,6 +1,12 @@
 package com.stuartsullivan.ir.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by stuart on 1/13/17.
@@ -10,20 +16,29 @@ import java.util.HashMap;
  * An Object to represent the Document files
  */
 public class Document {
-    // The Components of the 
-    private String raw = "";
-    private String text = "";
-    private String graphic = "";
-    private String docno = "";
+    // The Components of the
+    @JsonProperty
     private int docid = 0;
-    private String date = "";
-    private String headline = "";
-    private String byLine = "";
+    @JsonProperty
     private int wordcount = 0;
-    private HashMap<Integer, Integer> wordcounts = new HashMap<Integer, Integer>();
+    @JsonProperty
+    private String raw = "";
+    @JsonProperty
+    private String date = "";
+    @JsonProperty
+    private String text = "";
+    @JsonProperty
+    private String docno = "";
+    @JsonProperty
+    private String byLine = "";
+    @JsonProperty
+    private String graphic = "";
+    @JsonProperty
+    private String headline = "";
+    @JsonProperty
+    private HashMap<Integer, Integer> termcounts = new HashMap<Integer, Integer>();
 
-    public Document() {
-    }
+    public Document() {}
 
     public String getRaw() {
         return raw;
@@ -89,19 +104,16 @@ public class Document {
         this.docid = _docid;
     }
 
-    public int getWordcount() {
-        return wordcount;
-    }
+    public int getWordcount() { return wordcount; }
 
     public void setWordcount(int wordcount) {
         this.wordcount = wordcount;
     }
 
-    public int getTermCount(int i) {
-        return wordcounts.get(i);
-    }
+    @JsonIgnore
+    public Set<Integer> getTerms() { return termcounts.keySet(); }
 
-    public void setWordcounts(HashMap<Integer, Integer> wordcounts) {
-        this.wordcounts = wordcounts;
-    }
+    public int getTermCount(int i) { return termcounts.get(i); }
+
+    public void setTermCounts(HashMap<Integer, Integer> termcounts) { this.termcounts = termcounts; }
 }

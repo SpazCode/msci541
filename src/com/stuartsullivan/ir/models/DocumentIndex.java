@@ -1,7 +1,11 @@
 package com.stuartsullivan.ir.models;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
 
+import javax.print.Doc;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -14,6 +18,7 @@ import java.util.HashMap;
 public class DocumentIndex {
     private String path;
     private HashMap<Integer, String> mIndex = new HashMap<Integer, String>();
+    private final ObjectMapper mapper = new ObjectMapper();
 
     public DocumentIndex(String path) {
         this.path = path;
@@ -61,13 +66,15 @@ public class DocumentIndex {
             String ext = createPath(docno);
             // Load the file
             File f = new File(path + "/" + ext);
-            FileReader fr = new FileReader(f);
+            // FileReader fr = new FileReader(f);
             // Load the JSON file into the Document Object
             // Source: https://sites.google.com/site/gson/gson-user-guide
-            Gson gson = new Gson();
-            Document doc = gson.fromJson(fr, Document.class);
+            // Gson gson = new Gson();
+            // Document doc = gson.fromJson(fr, Document.class);
+            ObjectMapper mapper = new ObjectMapper();
+            Document doc = mapper.readValue(f, Document.class);
             return doc;
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             // Return Null if no file found
             e.printStackTrace();
             return null;
@@ -80,16 +87,34 @@ public class DocumentIndex {
             String ext = createPath(this.get(docid));
             // Load the file
             File f = new File(this.path + "/" + ext);
-            FileReader fr = new FileReader(f);
+            // FileReader fr = new FileReader(f);
             // Load the JSON file into the Document Object
             // Source: https://sites.google.com/site/gson/gson-user-guide
-            Gson gson = new Gson();
-            Document doc = gson.fromJson(fr, Document.class);
+            // Gson gson = new Gson();
+            // Document doc = gson.fromJson(fr, Document.class);
+            Document doc = mapper.readValue(f, Document.class);
             return doc;
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             // Return Null if no file found
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public static void SaveDocument(String path, Document doc) {
+        try {
+            ObjectMapper m = new ObjectMapper();
+            String ext = createPath(doc.getDocno());
+            File f = new File(path + "/" + ext);
+            // http://stackoverflow.com/questions/2833853/create-whole-path-automatically-when-writing-to-a-new-file
+            // Build/Ensure directory structure
+            f.getParentFile().mkdirs();
+            m.enable(SerializationFeature.INDENT_OUTPUT);
+            // Output the JSON file
+            m.writeValue(f, doc);
+        } catch (Exception e) {
+            // Print Stacktrace
+            e.printStackTrace();
         }
     }
 
