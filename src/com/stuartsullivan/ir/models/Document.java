@@ -1,11 +1,9 @@
 package com.stuartsullivan.ir.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -35,8 +33,8 @@ public class Document {
     private String graphic = "";
     @JsonProperty
     private String headline = "";
-    @JsonProperty
-    private HashMap<Integer, Integer> termcounts = new HashMap<Integer, Integer>();
+    @JsonIgnore
+    private HashMap termcounts = new HashMap();
 
     public Document() {}
 
@@ -111,9 +109,14 @@ public class Document {
     }
 
     @JsonIgnore
-    public Set<Integer> getTerms() { return termcounts.keySet(); }
+    public Set getTerms() { return termcounts.keySet(); }
 
-    public int getTermCount(int i) { return termcounts.get(i); }
+    public int getTermCount(Object i) {
+        String k = String.valueOf(i);
+        return Integer.parseInt(String.valueOf(termcounts.get(k)));
+    }
+
+    public HashMap getTermCounts() { return termcounts; }
 
     public void setTermCounts(HashMap<Integer, Integer> termcounts) { this.termcounts = termcounts; }
 }

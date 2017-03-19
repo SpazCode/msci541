@@ -22,12 +22,12 @@ public class Cosine {
         SimpleListInt tokens = Lexiconer.TokenIds(Lexiconer.Tokenize(query, stem), vocab);
         HashMap<Integer, Integer> counts = Lexiconer.CountTokens(tokens.getValues());
         for(int i : counts.keySet()) {
-            fi = doc.getTermCount(i);
+            fi = counts.get(i);
             ft = Lexiconer.TermFrequencyInCollection(i, postings);
             res += calc(fi, N, ft, 2);
         }
-        for(int i : doc.getTerms()) {
-            termId = i;
+        for(Object i : doc.getTerms()) {
+            termId = Integer.parseInt(String.valueOf(i));
             fi = doc.getTermCount(termId);
             ft = Lexiconer.TermFrequencyInCollection(termId, postings);
             W += Math.pow(calc(fi, N, ft, 1), 2);

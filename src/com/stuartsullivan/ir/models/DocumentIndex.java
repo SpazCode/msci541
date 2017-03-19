@@ -29,10 +29,14 @@ public class DocumentIndex {
     public String getPath() {
         return path;
     }
+
     public void setPath(String path) {
         this.path = path;
     }
-    public int getDocCount() { return mIndex.size(); }
+
+    public int getDocCount() {
+        return mIndex.size();
+    }
 
     // Getting the docno based on doc Id
     public String get(int index) {
@@ -51,7 +55,7 @@ public class DocumentIndex {
             while ((line = br.readLine()) != null) {
                 String[] index = line.split(",");
                 if (index.length == 2) {
-                   this.mIndex.put(Integer.parseInt(index[0]), index[1]);
+                    this.mIndex.put(Integer.parseInt(index[0]), index[1]);
                 }
             }
         } catch (Exception e) {
@@ -65,7 +69,7 @@ public class DocumentIndex {
             // Build the path to the document based on DOCNO
             String ext = createPath(docno);
             // Load the file
-            File f = new File(path + "/" + ext);
+            File f = new File(path + "/" + ext + "-data.json");
             // FileReader fr = new FileReader(f);
             // Load the JSON file into the Document Object
             // Source: https://sites.google.com/site/gson/gson-user-guide
@@ -73,6 +77,8 @@ public class DocumentIndex {
             // Document doc = gson.fromJson(fr, Document.class);
             ObjectMapper mapper = new ObjectMapper();
             Document doc = mapper.readValue(f, Document.class);
+            f = new File(path + "/" + ext + "-count.json");
+            doc.setTermCounts(mapper.readValue(f, HashMap.class));
             return doc;
         } catch (Exception e) {
             // Return Null if no file found
@@ -86,13 +92,15 @@ public class DocumentIndex {
             // Build the path to the document based on DOCNO
             String ext = createPath(this.get(docid));
             // Load the file
-            File f = new File(this.path + "/" + ext);
+            File f = new File(path + "/" + ext + "-data.json");
             // FileReader fr = new FileReader(f);
             // Load the JSON file into the Document Object
             // Source: https://sites.google.com/site/gson/gson-user-guide
             // Gson gson = new Gson();
             // Document doc = gson.fromJson(fr, Document.class);
             Document doc = mapper.readValue(f, Document.class);
+            f = new File(path + "/" + ext + "-count.json");
+            doc.setTermCounts(mapper.readValue(f, HashMap.class));
             return doc;
         } catch (Exception e) {
             // Return Null if no file found
@@ -105,13 +113,15 @@ public class DocumentIndex {
         try {
             ObjectMapper m = new ObjectMapper();
             String ext = createPath(doc.getDocno());
-            File f = new File(path + "/" + ext);
+            File f = new File(path + "/" + ext + "-data.json");
             // http://stackoverflow.com/questions/2833853/create-whole-path-automatically-when-writing-to-a-new-file
             // Build/Ensure directory structure
             f.getParentFile().mkdirs();
             m.enable(SerializationFeature.INDENT_OUTPUT);
             // Output the JSON file
             m.writeValue(f, doc);
+            f = new File(path + "/" + ext + "-count.json");
+            m.writeValue(f, doc.getTermCounts());
         } catch (Exception e) {
             // Print Stacktrace
             e.printStackTrace();
@@ -124,8 +134,8 @@ public class DocumentIndex {
         String[] docSegments = docno.split("-");
         String path = "data/";
         path = path + docSegments[0].substring(0, 2) + "/" + docSegments[0].substring(6, 8) + "/" +
-                docSegments[0].substring(2, 4) + "/" + docSegments[0].substring(4, 6)  + "/" +
-                docSegments[1] + ".json";
+                docSegments[0].substring(2, 4) + "/" + docSegments[0].substring(4, 6) + "/" +
+                docSegments[1];
         return path;
     }
 }
