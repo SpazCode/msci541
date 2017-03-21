@@ -19,10 +19,8 @@ public class Lexiconer {
         for(char c: sentence.toCharArray()) {
             if (start != end && !Character.isDigit(c) && !Character.isLetter(c)) {
                 String token = sentence.substring(start, end).trim();
-                if (stem || token.length() > 1) {
-                    stemer.set(token);
-                    stemer.stem();
-                    tokens.add(stemer.toString());
+                if (stem) {
+                    tokens.add(Stemmer.stem(token));
                 } else tokens.add(token);
                 start = end;
             }
@@ -37,25 +35,35 @@ public class Lexiconer {
         return tokens;
     }
 
-    public static HashMap<Integer, Integer> CountTokens(int[] tokenIds) {
+    public static HashMap<Integer, Integer> CountTokens(SimpleListInt tokenIds) {
         HashMap<Integer, Integer> termCounts = new HashMap<Integer, Integer>();
         int i;
-        for(i = 0; i < tokenIds.length; i++) {
-            if(termCounts.containsKey(tokenIds[i])) {
-                int val = termCounts.get(tokenIds[i]);
+        for(i = 0; i < tokenIds.getLength(); i++) {
+            if(termCounts.containsKey(tokenIds.get(i))) {
+                int val = termCounts.get(tokenIds.get(i));
                 val += 1;
-                termCounts.put(tokenIds[i], val);
+                termCounts.put(tokenIds.get(i), val);
             } else {
-                termCounts.put(tokenIds[i], 1);
+                termCounts.put(tokenIds.get(i), 1);
             }
         }
         return termCounts;
     }
 
+//    public static SimpleListInt TokenIds(ArrayList<String> tokens, Vocabulary vocabulary) {
+//        SimpleListInt tokenIds = new SimpleListInt();
+//        for(String token: tokens) {
+//            tokenIds.add(vocabulary.getNextId(token));
+//        }
+//        return tokenIds;
+//    }
+
     public static SimpleListInt TokenIds(ArrayList<String> tokens, Vocabulary vocabulary) {
         SimpleListInt tokenIds = new SimpleListInt();
+        int id;
         for(String token: tokens) {
-            tokenIds.add(vocabulary.getId(token));
+            id = vocabulary.getTokenId(token);
+            if (id > -1) tokenIds.add(id);
         }
         return tokenIds;
     }

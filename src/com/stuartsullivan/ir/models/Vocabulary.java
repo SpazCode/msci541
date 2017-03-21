@@ -22,7 +22,7 @@ public class Vocabulary {
     }
 
     // Get id for a token and create new id for new tokens
-    public int getId(String token) {
+    public int getNextId(String token) {
         if (dictionary.containsKey(token))
             return dictionary.get(token);
         else {
@@ -30,6 +30,14 @@ public class Vocabulary {
             dictionary.put(token, id);
             nextId++;
             return id;
+        }
+    }
+
+    public int getTokenId(String token) {
+        if (dictionary.containsKey(token))
+            return dictionary.get(token);
+        else {
+            return -1;
         }
     }
 
@@ -47,6 +55,10 @@ public class Vocabulary {
             max = Math.max(value, max);
         }
         return max;
+    }
+
+    public int getLength() {
+        return this.dictionary.size();
     }
 
     public void loadDictionary() {

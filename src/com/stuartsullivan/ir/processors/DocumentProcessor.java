@@ -122,14 +122,14 @@ public class DocumentProcessor {
     private SimpleListInt tokenIds(ArrayList<String> tokens, Vocabulary vocabulary) {
         SimpleListInt tokenIds = new SimpleListInt();
         for(String token: tokens) {
-            tokenIds.add(vocabulary.getId(token));
+            tokenIds.add(vocabulary.getNextId(token));
         }
         return tokenIds;
     }
 
     private HashMap<Integer, Integer> constructPostingList(PostingList postings, Vocabulary vocabulary, int docId, ArrayList<String> tokens) {
         SimpleListInt tokenIds = tokenIds(tokens, vocabulary);
-        HashMap<Integer, Integer> tokenCounts = Lexiconer.CountTokens(tokenIds.getValues());
+        HashMap<Integer, Integer> tokenCounts = Lexiconer.CountTokens(tokenIds);
         try {
             for (int tokenId : tokenCounts.keySet()) {
                 postings.add(tokenId, docId, tokenCounts.get(tokenId));

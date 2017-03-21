@@ -113,6 +113,7 @@ public class Document {
 
     public int getTermCount(Object i) {
         String k = String.valueOf(i);
+        if (termcounts.get(k) == null) return 0;
         return Integer.parseInt(String.valueOf(termcounts.get(k)));
     }
 

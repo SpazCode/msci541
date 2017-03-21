@@ -1,6 +1,7 @@
 package com.stuartsullivan.ir.utils;
 
 import com.stuartsullivan.ir.models.Document;
+import com.stuartsullivan.ir.models.DocumentIndex;
 import com.stuartsullivan.ir.models.PostingList;
 import com.stuartsullivan.ir.models.Vocabulary;
 
@@ -15,20 +16,18 @@ public class Cosine {
 
     }
 
-    public float score(String query, boolean stem, int N, Document doc, Vocabulary vocab, PostingList postings) {
-        float res = 0;
+    public float score(SimpleListInt tokens, HashMap<Integer, Integer> counts, int N, Document doc, Vocabulary vocab, PostingList postings, DocumentIndex index) {
+        float fi, ft, res = 0;
         double W = 0;
-        int fi, ft, termId;
-        SimpleListInt tokens = Lexiconer.TokenIds(Lexiconer.Tokenize(query, stem), vocab);
-        HashMap<Integer, Integer> counts = Lexiconer.CountTokens(tokens.getValues());
+        int termId;
         for(int i : counts.keySet()) {
-            fi = counts.get(i);
+            fi = (float) (doc.getTermCount(i)); // / (float) (doc.getWordcount());
             ft = Lexiconer.TermFrequencyInCollection(i, postings);
             res += calc(fi, N, ft, 2);
         }
         for(Object i : doc.getTerms()) {
             termId = Integer.parseInt(String.valueOf(i));
-            fi = doc.getTermCount(termId);
+            fi = (float) (doc.getTermCount(termId));
             ft = Lexiconer.TermFrequencyInCollection(termId, postings);
             W += Math.pow(calc(fi, N, ft, 1), 2);
         }
@@ -36,11 +35,12 @@ public class Cosine {
         return res;
     }
 
-    private float calc(float fi, int N, int ft, int pow) {
+    private float calc(float fi, int N, float ft, int pow) {
         float val;
-        val = (float) (N / ft);
+        val = (N / ft);
         val = (float) Math.log(val);
-        val = fi * val;
-        return (float) Math.pow(val, pow);
+        val = (float) Math.pow(val, pow);
+        return fi * val;
+
     }
 }

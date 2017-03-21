@@ -94,6 +94,7 @@ public class DocumentLookup {
 
     public static Scores[] BM25Search(String query, boolean stem, Vocabulary vocab, PostingList postings, DocumentIndex index, BM25 bm25) {
         SimpleListInt tokenIds = Lexiconer.TokenIds(Lexiconer.Tokenize(query, stem), vocab);
+        HashMap<Integer, Integer> counts = Lexiconer.CountTokens(tokenIds);
         HashMap<Integer, Scores> docScores = new HashMap<Integer, Scores>();
         int token, i, j, docid ;
         float score;
@@ -103,7 +104,7 @@ public class DocumentLookup {
             for(j = 0; j < postings.get(token).getLength(); j+=2) {
                 docid = postings.get(token).get(j);
                 if (docScores.containsKey(docid)) continue;
-                score = bm25.score(postings, vocab, index.getDocCount(), index.LoadDocument(docid), stem, query);
+                score = bm25.score(postings, vocab, index.getDocCount(), index.LoadDocument(docid), tokenIds, counts);
                 scoreObj = new Scores(docid, index.get(docid), score);
                 docScores.put(docid, scoreObj);
             }
@@ -115,6 +116,7 @@ public class DocumentLookup {
 
     public static Scores[] CosineSearch(String query, boolean stem, Vocabulary vocab, PostingList postings, DocumentIndex index, Cosine cosine) {
         SimpleListInt tokenIds = Lexiconer.TokenIds(Lexiconer.Tokenize(query, stem), vocab);
+        HashMap<Integer, Integer> counts = Lexiconer.CountTokens(tokenIds);
         HashMap<Integer, Scores> docScores = new HashMap<Integer, Scores>();
         int token, i, j, docid ;
         float score;
@@ -124,7 +126,29 @@ public class DocumentLookup {
             for(j = 0; j < postings.get(token).getLength(); j+=2) {
                 docid = postings.get(token).get(j);
                 if (docScores.containsKey(docid)) continue;
-                score = cosine.score(query, stem, index.getDocCount(), index.LoadDocument(docid), vocab, postings);
+                score = cosine.score(tokenIds, counts, index.getDocCount(), index.LoadDocument(docid), vocab, postings, index);
+                scoreObj = new Scores(docid, index.get(docid), score);
+                docScores.put(docid, scoreObj);
+            }
+        }
+        Scores[] scores = docScores.values().toArray(new Scores[docScores.values().size()]);
+        Arrays.sort(scores);
+        return scores;
+    }
+
+    public static Scores[] JMSearch(String query, boolean stem, Vocabulary vocab, PostingList postings, DocumentIndex index, LanguageModel lm) {
+        SimpleListInt tokenIds = Lexiconer.TokenIds(Lexiconer.Tokenize(query, stem), vocab);
+        HashMap<Integer, Integer> counts = Lexiconer.CountTokens(tokenIds);
+        HashMap<Integer, Scores> docScores = new HashMap<Integer, Scores>();
+        int token, i, j, docid ;
+        float score;
+        Scores scoreObj;
+        for(i = 0; i < tokenIds.getLength(); i++) {
+            token = tokenIds.get(i);
+            for(j = 0; j < postings.get(token).getLength(); j+=2) {
+                docid = postings.get(token).get(j);
+                if (docScores.containsKey(docid)) continue;
+                score = lm.score(tokenIds, counts, index.LoadDocument(docid), postings, vocab, index);
                 scoreObj = new Scores(docid, index.get(docid), score);
                 docScores.put(docid, scoreObj);
             }
