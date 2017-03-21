@@ -20,21 +20,25 @@ public class Cosine {
         float fi, ft, res = 0;
         double W = 0;
         int termId;
+        // Calculate the summation
         for(int i : counts.keySet()) {
             fi = (float) (doc.getTermCount(i)); // / (float) (doc.getWordcount());
             ft = Lexiconer.TermFrequencyInCollection(i, postings);
             res += calc(fi, N, ft, 2);
         }
+        // Calculate the document weight
         for(Object i : doc.getTerms()) {
             termId = Integer.parseInt(String.valueOf(i));
             fi = (float) (doc.getTermCount(termId));
             ft = Lexiconer.TermFrequencyInCollection(termId, postings);
             W += Math.pow(calc(fi, N, ft, 1), 2);
         }
+        // Put it all together
         res = (float) ((1/Math.sqrt(W)) * res);
         return res;
     }
 
+    // Calculate the fdt * log (N/ft) ^ i
     private float calc(float fi, int N, float ft, int pow) {
         float val;
         val = (N / ft);

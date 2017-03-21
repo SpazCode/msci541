@@ -44,22 +44,28 @@ public class BM25Search {
 
             String outputPath = args[2].trim();
             File output = new File(outputPath);
+            // Open file to output results
             BufferedWriter bfw = new BufferedWriter(new FileWriter(output));
             BufferedReader bfr = new BufferedReader(new FileReader(f));
+            // Load the collection describing objects
             PostingList postings = new PostingList(indexPath);
             Vocabulary vocabulary = new Vocabulary(indexPath);
             CollectionData about = CollectionData.LoadCollectionData(indexPath);
+            // Configure algorithm object
             BM25 bm25 = new BM25(0.75f, 1.2f, 7f, 512);
             DocumentIndex docIndex = new DocumentIndex(indexPath);
             String line = "";
             StringBuilder builder = new StringBuilder();
             while ((line = bfr.readLine()) != null) {
+                // Split queries into the numbers and the text
                 builder.setLength(0);
                 String topicId = line.split(":")[0];
                 String topicText = line.split(":")[1];
                 System.out.println(topicId);
+                // Run the scoring function
                 Scores[] res = DocumentLookup.BM25Search(topicText, about.isStemmedSet(), vocabulary, postings, docIndex, bm25);
                 int rank = 1;
+                // Output the collected scores to the file
                 for(rank = 0; rank < Math.min(1000, res.length); rank++) {
                     builder.setLength(0);
                     builder.append(topicId);
@@ -73,8 +79,10 @@ public class BM25Search {
                     bfw.write(builder.toString());
                 }
             }
+            // Close the files
             bfr.close();
             bfw.close();
+            // Output timing info
             final long endTime = System.currentTimeMillis();
             System.out.print((endTime - startTime)/1000 + " secs\n");
         } catch(Exception e) {

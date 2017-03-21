@@ -10,7 +10,6 @@ import java.util.HashMap;
  * Created by stuart on 1/21/17.
  */
 public class Lexiconer {
-    private static PorterStemer stemer = new PorterStemer();
     public static ArrayList<String> Tokenize(String sentence, boolean stem) {
         sentence = sentence.toLowerCase();
         ArrayList<String> tokens = new ArrayList<String>();
@@ -50,14 +49,6 @@ public class Lexiconer {
         return termCounts;
     }
 
-//    public static SimpleListInt TokenIds(ArrayList<String> tokens, Vocabulary vocabulary) {
-//        SimpleListInt tokenIds = new SimpleListInt();
-//        for(String token: tokens) {
-//            tokenIds.add(vocabulary.getNextId(token));
-//        }
-//        return tokenIds;
-//    }
-
     public static SimpleListInt TokenIds(ArrayList<String> tokens, Vocabulary vocabulary) {
         SimpleListInt tokenIds = new SimpleListInt();
         int id;
@@ -66,16 +57,6 @@ public class Lexiconer {
             if (id > -1) tokenIds.add(id);
         }
         return tokenIds;
-    }
-
-    public static int TermFrequencyInDoc(int termId, int docId, PostingList postings) {
-        SimpleListInt list = postings.get(termId);
-        for (int i = 0; i < list.getLength(); i+=2) {
-            if(list.get(i) == docId) {
-                return list.get(i+1);
-            }
-        }
-        return 0;
     }
 
     public static int TermFrequencyInCollection(int termId, PostingList postings) {

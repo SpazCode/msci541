@@ -92,68 +92,96 @@ public class DocumentLookup {
         return results;
     }
 
+
+    /**
+     *  Algorithm Ranking
+     * */
     public static Scores[] BM25Search(String query, boolean stem, Vocabulary vocab, PostingList postings, DocumentIndex index, BM25 bm25) {
+        // Tokenize and count the query
         SimpleListInt tokenIds = Lexiconer.TokenIds(Lexiconer.Tokenize(query, stem), vocab);
         HashMap<Integer, Integer> counts = Lexiconer.CountTokens(tokenIds);
         HashMap<Integer, Scores> docScores = new HashMap<Integer, Scores>();
         int token, i, j, docid ;
         float score;
         Scores scoreObj;
+        // Check at each word in the query....
         for(i = 0; i < tokenIds.getLength(); i++) {
             token = tokenIds.get(i);
+            // the docs in their postings list
             for(j = 0; j < postings.get(token).getLength(); j+=2) {
                 docid = postings.get(token).get(j);
+                // Skip doc if we have already seen it
                 if (docScores.containsKey(docid)) continue;
+                // Calculate a new score
                 score = bm25.score(postings, vocab, index.getDocCount(), index.LoadDocument(docid), tokenIds, counts);
+                // Add score to the hashtable
                 scoreObj = new Scores(docid, index.get(docid), score);
                 docScores.put(docid, scoreObj);
             }
         }
+        // Convert the score to an array of scores
         Scores[] scores = docScores.values().toArray(new Scores[docScores.values().size()]);
+        // Sort and return the scores
         Arrays.sort(scores);
         return scores;
     }
 
     public static Scores[] CosineSearch(String query, boolean stem, Vocabulary vocab, PostingList postings, DocumentIndex index, Cosine cosine) {
+        // Tokenize and count the query
         SimpleListInt tokenIds = Lexiconer.TokenIds(Lexiconer.Tokenize(query, stem), vocab);
         HashMap<Integer, Integer> counts = Lexiconer.CountTokens(tokenIds);
         HashMap<Integer, Scores> docScores = new HashMap<Integer, Scores>();
         int token, i, j, docid ;
         float score;
         Scores scoreObj;
+        // Check at each word in the query....
         for(i = 0; i < tokenIds.getLength(); i++) {
             token = tokenIds.get(i);
+            // the docs in their postings list
             for(j = 0; j < postings.get(token).getLength(); j+=2) {
                 docid = postings.get(token).get(j);
+                // Skip doc if we have already seen it
                 if (docScores.containsKey(docid)) continue;
+                // Calculate a new score
                 score = cosine.score(tokenIds, counts, index.getDocCount(), index.LoadDocument(docid), vocab, postings, index);
+                // Add score to the hashtable
                 scoreObj = new Scores(docid, index.get(docid), score);
                 docScores.put(docid, scoreObj);
             }
         }
+        // Convert the score to an array of scores
         Scores[] scores = docScores.values().toArray(new Scores[docScores.values().size()]);
+        // Add score to the hashtable
         Arrays.sort(scores);
         return scores;
     }
 
     public static Scores[] JMSearch(String query, boolean stem, Vocabulary vocab, PostingList postings, DocumentIndex index, LanguageModel lm) {
+        // Tokenize and count the query
         SimpleListInt tokenIds = Lexiconer.TokenIds(Lexiconer.Tokenize(query, stem), vocab);
         HashMap<Integer, Integer> counts = Lexiconer.CountTokens(tokenIds);
         HashMap<Integer, Scores> docScores = new HashMap<Integer, Scores>();
         int token, i, j, docid ;
         float score;
         Scores scoreObj;
+        // Check at each word in the query....
         for(i = 0; i < tokenIds.getLength(); i++) {
             token = tokenIds.get(i);
+            // the docs in their postings list
             for(j = 0; j < postings.get(token).getLength(); j+=2) {
                 docid = postings.get(token).get(j);
+                // Skip doc if we have already seen it
                 if (docScores.containsKey(docid)) continue;
+                // Calculate a new score
                 score = lm.score(tokenIds, counts, index.LoadDocument(docid), postings, vocab, index);
+                // Add score to the hashtable
                 scoreObj = new Scores(docid, index.get(docid), score);
                 docScores.put(docid, scoreObj);
             }
         }
+        // Convert the score to an array of scores
         Scores[] scores = docScores.values().toArray(new Scores[docScores.values().size()]);
+        // Add score to the hashtable
         Arrays.sort(scores);
         return scores;
     }

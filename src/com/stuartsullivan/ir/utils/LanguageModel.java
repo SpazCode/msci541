@@ -19,8 +19,9 @@ public class LanguageModel {
     private SimpleListInt tokenIds;
     private HashMap<Integer, Integer> counts;
 
-    public LanguageModel(float l) {
-        this.lambda = l;
+    // Constructor
+    public LanguageModel(float m) {
+        this.m = m;
     }
 
     public LanguageModel(float l, float m) {
@@ -28,19 +29,7 @@ public class LanguageModel {
         this.m = m;
     }
 
-    public float score_laplace(SimpleListInt tokenIds, HashMap<Integer, Integer> counts, Document doc, PostingList posting, Vocabulary vocab, DocumentIndex index) {
-        float total, res = 0;
-        this.lambda = index.getDocCount() / (index.getDocCount() + this.m);
-        for(int i : counts.keySet()) {
-            total = doc.getTermCount(i) + 1;
-            total = (float) Math.log(total);
-            total = counts.get(i) * total;
-            res += total;
-        }
-        return res;
-    }
-
-    // JM Scoring
+    // JM Scoring Function
     public float score(SimpleListInt tokenIds, HashMap<Integer, Integer> counts, Document doc, PostingList posting, Vocabulary vocab, DocumentIndex index) {
         float total, wnD, wnC, res = 0;
         int token;
@@ -56,18 +45,6 @@ public class LanguageModel {
             res += total;
         }
 
-//        for(int i = 0; i < tokenIds.getLength(); i++) {
-//            token = tokenIds.get(i);
-//            total = (float) (counts.get(token) * Math.log(this.lambda));
-//            res += total;
-//        }
-//
-//        for(int i = 0; i < tokenIds.getLength(); i++) {
-//            token = tokenIds.get(i);
-//            wnC = (float) (posting.get(i).getLength() / 2) / (float) index.getDocCount();
-//            total = (float) (counts.get(token) * Math.log(wnC));
-//            res += total;
-//        }
         return res;
     }
 

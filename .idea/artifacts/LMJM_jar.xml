@@ -1,0 +1,13 @@
+<component name="ArtifactManager">
+  <artifact build-on-make="true" name="LMJM:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/LMJM_jar</output-path>
+    <root id="root">
+      <element id="archive" name="MSCI541Assignments.jar">
+        <element id="directory" name="META-INF">
+          <element id="file-copy" path="$PROJECT_DIR$/src/manifests/jm/META-INF/MANIFEST.MF" />
+        </element>
+        <element id="module-output" name="MSCI541Assignments" />
+      </element>
+    </root>
+  </artifact>
+</component>

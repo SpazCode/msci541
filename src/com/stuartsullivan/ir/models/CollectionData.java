@@ -7,6 +7,9 @@ import java.io.*;
 
 /**
  * Created by stuart on 3/14/17.
+ *
+ * This Data Model is used to describe properties of the collection that helps in retrieval
+ *
  */
 public class CollectionData {
     private int DocumentCount = 0;
