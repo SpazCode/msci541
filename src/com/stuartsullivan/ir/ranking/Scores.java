@@ -48,4 +48,13 @@ public class Scores implements Comparable<Scores> {
         //descending order
         //return compareQuantity - this.quantity;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(this.docno);
+        builder.append('\t');
+        builder.append(this.score);
+        return builder.toString();
+    }
 }
