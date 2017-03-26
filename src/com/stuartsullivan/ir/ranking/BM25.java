@@ -1,15 +1,17 @@
-package com.stuartsullivan.ir.utils;
+package com.stuartsullivan.ir.ranking;
 
 import com.stuartsullivan.ir.models.Document;
+import com.stuartsullivan.ir.models.DocumentIndex;
 import com.stuartsullivan.ir.models.PostingList;
 import com.stuartsullivan.ir.models.Vocabulary;
+import com.stuartsullivan.ir.utils.SimpleListInt;
 
 import java.util.HashMap;
 
 /**
  * Created by stuart on 3/12/17.
  */
-public class BM25 {
+public class BM25 implements Ranker {
     // b calibration
     private float b = 0.75f;
     // k1 calibration
@@ -57,5 +59,27 @@ public class BM25 {
         res = res * this.b;
         res = (1 - this.b) + res;
         return this.k1 * res;
+    }
+
+    public float score(SimpleListInt tokenIds, HashMap<Integer, Integer> counts, Document doc, PostingList postings, Vocabulary vocab, DocumentIndex index) {
+        float score = 0.0f;
+        int docsWithTerm, count;
+        int docCount = index.getDocCount();
+        float fi, tfindoc, tfinque, idf;
+        for(int i = 0; i < tokenIds.getLength(); i++) {
+            count = counts.get(tokenIds.get(i));
+            docsWithTerm = postings.get(tokenIds.get(i)).getLength()/2;
+            // Get fi
+            fi = doc.getTermCount(tokenIds.get(i));
+            // Get tfid
+            tfindoc = ((this.k1 + 1) * fi) / (K(doc) + fi);
+            // Get tfiq
+            tfinque = ((this.k2 + 1) * count)/(this.k2 + (count));
+            // Get idf
+            idf = (float) Math.log((docCount-docsWithTerm+0.5)/(docsWithTerm+0.5));
+            // Sum up their products
+            score += (tfindoc * tfinque * idf);
+        }
+        return score;
     }
 }

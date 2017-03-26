@@ -1,9 +1,8 @@
-package com.stuartsullivan.ir;
+package com.stuartsullivan.ir.lookup;
 
 import com.stuartsullivan.ir.models.DocumentIndex;
 import com.stuartsullivan.ir.models.PostingList;
 import com.stuartsullivan.ir.models.Vocabulary;
-import com.stuartsullivan.ir.processors.DocumentLookup;
 import com.stuartsullivan.ir.utils.SimpleListInt;
 
 import java.io.*;

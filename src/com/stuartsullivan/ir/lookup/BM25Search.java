@@ -1,19 +1,18 @@
-package com.stuartsullivan.ir;
+package com.stuartsullivan.ir.lookup;
 
 import com.stuartsullivan.ir.models.CollectionData;
 import com.stuartsullivan.ir.models.DocumentIndex;
 import com.stuartsullivan.ir.models.PostingList;
 import com.stuartsullivan.ir.models.Vocabulary;
-import com.stuartsullivan.ir.processors.DocumentLookup;
-import com.stuartsullivan.ir.utils.LanguageModel;
-import com.stuartsullivan.ir.utils.Scores;
+import com.stuartsullivan.ir.ranking.BM25;
+import com.stuartsullivan.ir.ranking.Scores;
 
 import java.io.*;
 
 /**
- * Created by stuart on 3/19/17.
+ * Created by stuart on 3/14/17.
  */
-public class JMSearch {
+public class BM25Search {
     public static void main(String[] args) {
         try {
             final long startTime = System.currentTimeMillis();
@@ -44,22 +43,28 @@ public class JMSearch {
 
             String outputPath = args[2].trim();
             File output = new File(outputPath);
+            // Open file to output results
             BufferedWriter bfw = new BufferedWriter(new FileWriter(output));
             BufferedReader bfr = new BufferedReader(new FileReader(f));
+            // Load the collection describing objects
             PostingList postings = new PostingList(indexPath);
             Vocabulary vocabulary = new Vocabulary(indexPath);
             CollectionData about = CollectionData.LoadCollectionData(indexPath);
-            LanguageModel lm = new LanguageModel(0, 1000);
+            // Configure algorithm object
+            BM25 bm25 = new BM25(0.75f, 1.2f, 7f, 512);
             DocumentIndex docIndex = new DocumentIndex(indexPath);
             String line = "";
             StringBuilder builder = new StringBuilder();
             while ((line = bfr.readLine()) != null) {
+                // Split queries into the numbers and the text
                 builder.setLength(0);
                 String topicId = line.split(":")[0];
                 String topicText = line.split(":")[1];
                 System.out.println(topicId);
-                Scores[] res = DocumentLookup.JMSearch(topicText, about.isStemmedSet(), vocabulary, postings, docIndex, lm);
+                // Run the scoring function
+                Scores[] res = DocumentLookup.BM25Search(topicText, about.isStemmedSet(), vocabulary, postings, docIndex, bm25);
                 int rank = 1;
+                // Output the collected scores to the file
                 for(rank = 0; rank < Math.min(1000, res.length); rank++) {
                     builder.setLength(0);
                     builder.append(topicId);
@@ -73,8 +78,10 @@ public class JMSearch {
                     bfw.write(builder.toString());
                 }
             }
+            // Close the files
             bfr.close();
             bfw.close();
+            // Output timing info
             final long endTime = System.currentTimeMillis();
             System.out.print((endTime - startTime)/1000 + " secs\n");
         } catch(Exception e) {

@@ -1,20 +1,18 @@
-package com.stuartsullivan.ir;
+package com.stuartsullivan.ir.lookup;
 
 import com.stuartsullivan.ir.models.CollectionData;
 import com.stuartsullivan.ir.models.DocumentIndex;
 import com.stuartsullivan.ir.models.PostingList;
 import com.stuartsullivan.ir.models.Vocabulary;
-import com.stuartsullivan.ir.processors.DocumentLookup;
-import com.stuartsullivan.ir.utils.BM25;
-import com.stuartsullivan.ir.utils.Cosine;
-import com.stuartsullivan.ir.utils.Scores;
+import com.stuartsullivan.ir.ranking.LanguageModel;
+import com.stuartsullivan.ir.ranking.Scores;
 
 import java.io.*;
 
 /**
- * Created by stuart on 3/16/17.
+ * Created by stuart on 3/19/17.
  */
-public class CosineSearch {
+public class JMSearch {
     public static void main(String[] args) {
         try {
             final long startTime = System.currentTimeMillis();
@@ -50,7 +48,7 @@ public class CosineSearch {
             PostingList postings = new PostingList(indexPath);
             Vocabulary vocabulary = new Vocabulary(indexPath);
             CollectionData about = CollectionData.LoadCollectionData(indexPath);
-            Cosine cosine = new Cosine();
+            LanguageModel lm = new LanguageModel(0, 1000);
             DocumentIndex docIndex = new DocumentIndex(indexPath);
             String line = "";
             StringBuilder builder = new StringBuilder();
@@ -59,7 +57,7 @@ public class CosineSearch {
                 String topicId = line.split(":")[0];
                 String topicText = line.split(":")[1];
                 System.out.println(topicId);
-                Scores[] res = DocumentLookup.CosineSearch(topicText, about.isStemmedSet(), vocabulary, postings, docIndex, cosine);
+                Scores[] res = DocumentLookup.JMSearch(topicText, about.isStemmedSet(), vocabulary, postings, docIndex, lm);
                 int rank = 1;
                 for(rank = 0; rank < Math.min(1000, res.length); rank++) {
                     builder.setLength(0);

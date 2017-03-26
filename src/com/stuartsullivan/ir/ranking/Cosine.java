@@ -1,9 +1,11 @@
-package com.stuartsullivan.ir.utils;
+package com.stuartsullivan.ir.ranking;
 
 import com.stuartsullivan.ir.models.Document;
 import com.stuartsullivan.ir.models.DocumentIndex;
 import com.stuartsullivan.ir.models.PostingList;
 import com.stuartsullivan.ir.models.Vocabulary;
+import com.stuartsullivan.ir.utils.Lexiconer;
+import com.stuartsullivan.ir.utils.SimpleListInt;
 
 
 import java.util.HashMap;
@@ -11,7 +13,7 @@ import java.util.HashMap;
 /**
  * Created by stuart on 3/16/17.
  */
-public class Cosine {
+public class Cosine implements Ranker {
     public Cosine() {
 
     }
@@ -46,5 +48,27 @@ public class Cosine {
         val = (float) Math.pow(val, pow);
         return fi * val;
 
+    }
+
+    public float score(SimpleListInt tokenIds, HashMap<Integer, Integer> counts, Document doc, PostingList postings, Vocabulary vocab, DocumentIndex index) {
+        float fi, ft, res = 0;
+        double W = 0;
+        int termId, N = index.getDocCount();
+        // Calculate the summation
+        for(int i : counts.keySet()) {
+            fi = (float) (doc.getTermCount(i)); // / (float) (doc.getWordcount());
+            ft = Lexiconer.TermFrequencyInCollection(i, postings);
+            res += calc(fi, N, ft, 2);
+        }
+        // Calculate the document weight
+        for(Object i : doc.getTerms()) {
+            termId = Integer.parseInt(String.valueOf(i));
+            fi = (float) (doc.getTermCount(termId));
+            ft = Lexiconer.TermFrequencyInCollection(termId, postings);
+            W += Math.pow(calc(fi, N, ft, 1), 2);
+        }
+        // Put it all together
+        res = (float) ((1/Math.sqrt(W)) * res);
+        return res;
     }
 }

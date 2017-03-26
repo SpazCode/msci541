@@ -1,9 +1,10 @@
-package com.stuartsullivan.ir.utils;
+package com.stuartsullivan.ir.ranking;
 
 import com.stuartsullivan.ir.models.Document;
 import com.stuartsullivan.ir.models.DocumentIndex;
 import com.stuartsullivan.ir.models.PostingList;
 import com.stuartsullivan.ir.models.Vocabulary;
+import com.stuartsullivan.ir.utils.SimpleListInt;
 
 import javax.print.Doc;
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ import java.util.Set;
 /**
  * Created by stuart on 3/19/17.
  */
-public class LanguageModel {
+public class LanguageModel implements Ranker{
     private float lambda, m = 1000;
     private SimpleListInt tokenIds;
     private HashMap<Integer, Integer> counts;

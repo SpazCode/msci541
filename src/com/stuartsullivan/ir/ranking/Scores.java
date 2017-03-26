@@ -1,4 +1,4 @@
-package com.stuartsullivan.ir.utils;
+package com.stuartsullivan.ir.ranking;
 
 /**
  * Created by stuart on 3/14/17.

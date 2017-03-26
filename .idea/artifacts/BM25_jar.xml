@@ -3,7 +3,7 @@
     <output-path>$PROJECT_DIR$/out/artifacts/BM25_jar</output-path>
     <root id="archive" name="BM25.jar">
       <element id="directory" name="META-INF">
-        <element id="file-copy" path="$PROJECT_DIR$/src/artifacts/bm25/META-INF/MANIFEST.MF" />
+        <element id="file-copy" path="$PROJECT_DIR$/src/manifests/bm25/META-INF/MANIFEST.MF" />
       </element>
       <element id="module-output" name="MSCI541Assignments" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/jackson-annotations-2.8.7.jar" path-in-jar="/" />

@@ -1,4 +1,4 @@
-package com.stuartsullivan.ir;
+package com.stuartsullivan.ir.processors;
 
 import com.stuartsullivan.ir.models.CollectionData;
 import com.stuartsullivan.ir.models.PostingList;

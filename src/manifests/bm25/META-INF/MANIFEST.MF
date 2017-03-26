@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
-Main-Class: com.stuartsullivan.ir.BM25Search
+Main-Class: com.stuartsullivan.ir.lookup.BM25Search
 

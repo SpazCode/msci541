@@ -1,6 +1,4 @@
-package com.stuartsullivan.ir;
-
-import com.stuartsullivan.ir.processors.DocumentLookup;
+package com.stuartsullivan.ir.lookup;
 
 import java.io.File;
 
