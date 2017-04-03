@@ -97,9 +97,8 @@ public class DocumentLookup {
     /**
      *  Algorithm Ranking
      * */
-    public static Scores[] Search(String query, boolean stem, Vocabulary vocab, PostingList postings, DocumentIndex index, Ranker ranker) {
+    public static Scores[] Search(SimpleListInt tokenIds, Vocabulary vocab, PostingList postings, DocumentIndex index, Ranker ranker) {
         // Tokenize and count the query
-        SimpleListInt tokenIds = Lexiconer.TokenIds(Lexiconer.Tokenize(query, stem), vocab);
         HashMap<Integer, Integer> counts = Lexiconer.CountTokens(tokenIds);
         HashMap<Integer, Scores> docScores = new HashMap<Integer, Scores>();
         int token, i, j, docid ;

@@ -7,6 +7,8 @@ public class Scores implements Comparable<Scores> {
     private int docid;
     private String docno;
     private float score;
+    private String docHeadline;
+    private String docSnippet;
 
     public Scores(int _docid, String _docno, float _score) {
         this.docid = _docid;
@@ -56,5 +58,21 @@ public class Scores implements Comparable<Scores> {
         builder.append('\t');
         builder.append(this.score);
         return builder.toString();
+    }
+
+    public String getDocHeadline() {
+        return docHeadline;
+    }
+
+    public void setDocHeadline(String docHeadline) {
+        this.docHeadline = docHeadline;
+    }
+
+    public String getDocSnippet() {
+        return docSnippet;
+    }
+
+    public void setDocSnippet(String docSnippet) {
+        this.docSnippet = docSnippet;
     }
 }

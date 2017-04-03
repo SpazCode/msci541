@@ -1,0 +1,15 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="CLI:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/CLI_jar</output-path>
+    <root id="archive" name="CLI_jar.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/src/manifests/cli/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="module-output" name="MSCI541Assignments" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/gson-2.3.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jackson-annotations-2.8.7.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jackson-core-2.8.7.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jackson-databind-2.8.7.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
