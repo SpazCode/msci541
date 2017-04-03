@@ -56,10 +56,10 @@ public class CLI {
         while (searching) {
             showing = true;
             System.out.println("Please enter a query: ");
-            query = scanner.next();
+            query = scanner.nextLine();
             System.out.println("Searching");
-            startTime = System.currentTimeMillis();
             SimpleListInt tokenIds = Lexiconer.TokenIds(Lexiconer.Tokenize(query, about.isStemmedSet()), vocab);
+            startTime = System.currentTimeMillis();
             scores = DocumentLookup.Search(tokenIds, vocab, postings, index, bm25);
             endTime = System.currentTimeMillis();
             scores = SnippetEngine.Snippets(scores, index, vocab, tokenIds, about.isStemmedSet(), 0, 10);
@@ -79,7 +79,7 @@ public class CLI {
                 System.out.println("Done In: " +  ((float) (endTime - startTime)/1000) + " secs");
                 while(true) {
                     System.out.println("Enter the number to see the contents of the document\nEnter 'Q' to exit the search engine\nEnter 'N' to make another query\nEnter 'R' to See the Results again: ");
-                    query = scanner.next().trim();
+                    query = scanner.nextLine().trim();
                     try {
                         int pos = Integer.parseInt(query);
                         if (pos > 10) {
